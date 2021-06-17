@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+    postgres:
+        image: postgres:latest
+        restart: always
+        environment: 
+          - POSTGRES_USER=${POSTGRES_USER}
+          - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        logging:
+          options:
+            max-size: 10m
+            max-file: "3"
+        ports:
+          - "5438:5432"
+        volumes:
+          - ./data/resources/sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+          - ./data/resources/sql/populate_tables.sql:/docker-entrypoint-initdb.d/populate_tables.sql
