@@ -2,6 +2,9 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+POSTGRES_USER = os.environ["POSTGRES_USER"]
+POSTGRES_PASSWORD = os.environ["POSTGRES_PASSWORD"]
+
 app = FastAPI()
 
 origins = [
@@ -19,4 +22,4 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"backend": "Hello World!"}
+    return {"backend": "Hello world!"}
