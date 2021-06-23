@@ -1,3 +1,10 @@
+Create `.env` file:
+```
+POSTGRES_USER=username
+POSTGRES_PASSWORD=password
+```
+`docker-compose --env-file .env up`
+
 ```sql
 postgres=# SELECT COUNT(id) FROM orders WHERE arrived < '2021-04-12T11:10:06.473587Z';
  count
