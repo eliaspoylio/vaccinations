@@ -15,3 +15,10 @@ services:
         volumes:
           - ./data/resources/sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
           - ./data/resources/sql/populate_tables.sql:/docker-entrypoint-initdb.d/populate_tables.sql
+    backend:
+        build: ./backend
+        ports:
+          - '8080:8080'
+        volumes:
+        - ./backend:/app
+        command: ['python', 'main.py']
