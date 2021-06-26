@@ -2,6 +2,8 @@ Create `.env` file:
 ```
 POSTGRES_USER=username
 POSTGRES_PASSWORD=password
+POSTGRES_URL=postgres:5432
+POSTGRES_DB=vaccinations
 ```
 `docker-compose --env-file .env up --build`
 
