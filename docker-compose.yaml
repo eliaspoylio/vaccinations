@@ -27,4 +27,6 @@ services:
           - 8080:8080
         volumes:
         - ./backend:/app
-        command: ['python', 'main.py']
+        depends_on:
+          - "postgres"
+        command: bash -c 'while !</dev/tcp/postgres/5432; do sleep 1; done; python main.py'
