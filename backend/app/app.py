@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .database import SessionLocal, engine
 from sqlalchemy.orm import Session
-from sqlalchemy import text
+from sqlalchemy import text, func, select
 
 from . import models, schemas
 from typing import List
@@ -42,3 +42,14 @@ async def root():
 def show_records(db: Session = Depends(get_db)):
     orders = db.query(models.Order).all()
     return orders
+
+@app.get("/vaccinations/", response_model=List[schemas.Vaccination])
+def show_records(db: Session = Depends(get_db)):
+    vaccinations = db.query(models.Vaccination).all()
+    return vaccinations
+
+@app.get("/injections/{day}")
+def show_records(day, db: Session = Depends(get_db)):
+    statement = select(func.sum(models.Order.injections)).where(models.Order.arrived<day)
+    result = db.execute(statement).all()
+    return result

@@ -12,12 +12,13 @@ class Order(BaseModel):
 
     class Config:
         orm_mode = True
+        #allow_population_by_field_name = True
 
 class Vaccination(BaseModel):
     id: str
-    sourceBottle: str
+    sourcebottle: str
     gender: str
-    vaccinationDate: datetime
+    vaccinationdate: datetime
 
     class Config:
         orm_mode = True

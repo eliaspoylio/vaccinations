@@ -18,6 +18,6 @@ class Vaccination(Base):
     __tablename__ = "vaccinations"
 
     id = Column(String, primary_key=True)
-    sourceBottle = Column(String)
+    sourcebottle = Column(String)
     gender = Column(String)
-    vaccinationDate = Column(TIMESTAMP)
+    vaccinationdate = Column(TIMESTAMP)
