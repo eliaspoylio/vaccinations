@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .database import SessionLocal, engine
 from sqlalchemy.orm import Session
-from sqlalchemy import text, func, select
+from sqlalchemy import text, func, select, cast, DATE
 
 from . import models, schemas
 from typing import List
@@ -39,17 +39,23 @@ async def root():
     return {"backend": "Hello world!"}
 
 @app.get("/orders/", response_model=List[schemas.Order])
-def show_records(db: Session = Depends(get_db)):
+def show_orders(db: Session = Depends(get_db)):
     orders = db.query(models.Order).all()
     return orders
 
 @app.get("/vaccinations/", response_model=List[schemas.Vaccination])
-def show_records(db: Session = Depends(get_db)):
+def show_vaccinations(db: Session = Depends(get_db)):
     vaccinations = db.query(models.Vaccination).all()
     return vaccinations
 
 @app.get("/injections/{day}")
-def show_records(day, db: Session = Depends(get_db)):
+def show_injections_arrived(day, db: Session = Depends(get_db)):
     statement = select(func.sum(models.Order.injections)).where(models.Order.arrived<day)
+    result = db.execute(statement).all()
+    return result
+
+@app.get("/orders/day/{day}")
+def show_orders_arrived_day(day, db: Session = Depends(get_db)):
+    statement = select(func.count(models.Order.id)).where(cast(models.Order.arrived, DATE)==day)
     result = db.execute(statement).all()
     return result
