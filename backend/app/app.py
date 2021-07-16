@@ -25,6 +25,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+
 def get_db():
     db = SessionLocal()
     try:
@@ -32,30 +33,56 @@ def get_db():
     finally:
         db.close()
 
+
 models.Base.metadata.create_all(bind=engine)
+
 
 @app.get("/")
 async def root():
     return {"backend": "Hello world!"}
+
 
 @app.get("/orders/", response_model=List[schemas.Order])
 def show_orders(db: Session = Depends(get_db)):
     orders = db.query(models.Order).all()
     return orders
 
+
 @app.get("/vaccinations/", response_model=List[schemas.Vaccination])
 def show_vaccinations(db: Session = Depends(get_db)):
     vaccinations = db.query(models.Vaccination).all()
     return vaccinations
 
+
 @app.get("/injections/{day}")
 def show_injections_arrived(day, db: Session = Depends(get_db)):
-    statement = select(func.sum(models.Order.injections)).where(models.Order.arrived<day)
+    statement = select(func.sum(models.Order.injections)
+                       ).where(models.Order.arrived < day)
     result = db.execute(statement).all()
     return result
 
+
 @app.get("/orders/day/{day}")
 def show_orders_arrived_day(day, db: Session = Depends(get_db)):
-    statement = select(func.count(models.Order.id)).where(cast(models.Order.arrived, DATE)==day)
+    statement = select(func.count(models.Order.id)).where(
+        cast(models.Order.arrived, DATE) == day)
     result = db.execute(statement).all()
+    return result
+
+
+@app.get("/expired/{day}")
+def show_orders_arrived_day(day, db: Session = Depends(get_db)):
+    statement = text("""
+    WITH ordersused AS (
+    SELECT orders.id, arrived + interval '30 days' AS "expires", COUNT(vaccinations.sourceBottle) AS "used",
+    injections - COUNT(vaccinations.sourceBottle) AS "unused"
+    FROM orders
+    FULL OUTER JOIN vaccinations ON orders.id = vaccinations.sourceBottle
+    GROUP BY orders.id, orders.arrived, orders.injections
+    )
+    SELECT SUM(unused)
+    FROM ordersused
+    WHERE expires < :day;
+    """)
+    result = db.execute(statement, {'day': day}).all()
     return result
