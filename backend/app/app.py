@@ -53,6 +53,18 @@ def show_vaccinations(db: Session = Depends(get_db)):
     vaccinations = db.query(models.Vaccination).all()
     return vaccinations
 
+@app.get("/orders/count")
+def show_orders_arrived_count(db: Session = Depends(get_db)):
+    statement = select(func.count(models.Order.ordernumber))
+    result = db.execute(statement).all()
+    return result
+
+@app.get("/vaccinations/count")
+def show_orders_arrived_count(db: Session = Depends(get_db)):
+    statement = select(func.count(models.Vaccination.id))
+    result = db.execute(statement).all()
+    return result
+
 
 @app.get("/injections/total/{day}")
 def show_injections_arrived_total(day, db: Session = Depends(get_db)):
