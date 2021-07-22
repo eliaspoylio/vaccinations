@@ -24,3 +24,8 @@ def test_show_orders_arrived_day():
     response = client.get("/orders/day/2021-03-20")
     assert response.status_code == 200
     assert response.json() == [{"count": 61}]
+
+def test_show_vaccinations_used_day():
+    response = client.get("/vaccinations/used/2021-01-05")
+    assert response.status_code == 200
+    assert response.json() == [{"sum": 8}]

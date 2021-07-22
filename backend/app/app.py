@@ -54,8 +54,8 @@ def show_vaccinations(db: Session = Depends(get_db)):
     return vaccinations
 
 
-@app.get("/injections/{day}")
-def show_injections_arrived(day, db: Session = Depends(get_db)):
+@app.get("/injections/total/{day}")
+def show_injections_arrived_total(day, db: Session = Depends(get_db)):
     statement = select(func.sum(models.Order.injections)
                        ).where(models.Order.arrived < day)
     result = db.execute(statement).all()
@@ -69,8 +69,24 @@ def show_orders_arrived_day(day, db: Session = Depends(get_db)):
     result = db.execute(statement).all()
     return result
 
+@app.get("/vaccinations/used/{day}")
+def show_vaccinations_used_day(day, db: Session = Depends(get_db)):
+    statement = text("""
+    WITH injectionsused AS (
+    SELECT orders.id, orders.injections, COUNT(vaccinations.sourceBottle) AS "vused"
+    FROM orders
+    INNER JOIN vaccinations ON orders.id = vaccinations.sourceBottle
+    WHERE vaccinations.vaccinationDate < :day 
+    GROUP BY orders.id, orders.injections
+    )
+    SELECT SUM(vused)
+    FROM injectionsused;
+    """)
+    result = db.execute(statement, {'day': day}).all()
+    return result
 
-@app.get("/expired/{day}")
+
+@app.get("/vaccinations/expired/{day}")
 def show_orders_arrived_day(day, db: Session = Depends(get_db)):
     statement = text("""
     WITH ordersused AS (
