@@ -30,12 +30,32 @@ def test_show_vaccinations_arrived_total():
     assert response.status_code == 200
     assert response.json() == [{"sum": 25015}]
 
+def test_show_vaccinations_used_day():
+    response = client.get("/vaccinations/used/2021-01-05")
+    assert response.status_code == 200
+    assert response.json() == [{"sum": 8}]
+
+def test_show_orders_expired_day():
+    response = client.get("/orders/expired/2021-04-12T11:10:06.473587Z")
+    assert response.status_code == 200
+    assert response.json() == [{"count": 3482}]
+
+def test_show_vaccinations_expired_day():
+    response = client.get("/vaccinations/expired/2021-04-12T11:10:06.473587Z")
+    assert response.status_code == 200
+    assert response.json() == [{"sum": 12590}]
+
+def test_show_vaccinations_left_day():
+    response = client.get("/vaccinations/left/2021-04-12T11:10:06.473587Z")
+    assert response.status_code == 200
+    assert response.json() == [{"sum": 123456789}]
+
 def test_show_orders_arrived_day():
     response = client.get("/orders/day/2021-03-20")
     assert response.status_code == 200
     assert response.json() == [{"count": 61}]
 
-def test_show_vaccinations_used_day():
-    response = client.get("/vaccinations/used/2021-01-05")
+def test_show_orders_manufacturer_total_day():
+    response = client.get("/orders/manufacturer/total/2021-04-12T11:10:06.473587Z")
     assert response.status_code == 200
-    assert response.json() == [{"sum": 8}]
+    assert response.json() == [{"Zerpfy": 123456789, "Antiqua": 123456789, "SolarBuddhica": 123456789}]

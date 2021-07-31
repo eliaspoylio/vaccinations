@@ -99,7 +99,7 @@ export default {
 
       let ordDay = `http://${this.apiUri}/orders/day/` + this.date;
 
-      let byManuf = `http://${this.apiUri}/orders/manufacturer/` + this.date;
+      let byManuf = `http://${this.apiUri}/orders/manufacturer/total/` + this.date;
 
       const reqOrdTotal = axios.get(ordTotal);
 

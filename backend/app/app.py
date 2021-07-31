@@ -79,13 +79,6 @@ def show_vaccinations_arrived_total(day, db: Session = Depends(get_db)):
     result = db.execute(statement).all()
     return result
 
-@app.get("/orders/day/{day}")
-def show_orders_arrived_day(day, db: Session = Depends(get_db)):
-    statement = select(func.count(models.Order.id)).where(
-        cast(models.Order.arrived, DATE) == day)
-    result = db.execute(statement).all()
-    return result
-
 @app.get("/vaccinations/used/{day}")
 def show_vaccinations_used_day(day, db: Session = Depends(get_db)):
     statement = text("""
@@ -101,6 +94,10 @@ def show_vaccinations_used_day(day, db: Session = Depends(get_db)):
     """)
     result = db.execute(statement, {'day': day}).all()
     return result
+
+@app.get("/orders/expired/{day}")
+def show_orders_expired_day(day, db: Session = Depends(get_db)):
+    return {"count": "placeholder"}
 
 @app.get("/vaccinations/expired/{day}")
 def show_orders_arrived_day(day, db: Session = Depends(get_db)):
@@ -118,3 +115,20 @@ def show_orders_arrived_day(day, db: Session = Depends(get_db)):
     """)
     result = db.execute(statement, {'day': day}).all()
     return result
+
+@app.get("/vaccinations/left/{day}")
+def show_vaccinations_left_day(day, db: Session = Depends(get_db)):
+    return {"sum": "placeholder"}
+
+@app.get("/orders/day/{day}")
+def show_orders_arrived_day(day, db: Session = Depends(get_db)):
+    statement = select(func.count(models.Order.id)).where(
+        cast(models.Order.arrived, DATE) == day)
+    result = db.execute(statement).all()
+    return result
+
+@app.get("/orders/manufacturer/total/{day}")
+def show_orders_manufacturer_total_day(day, db: Session = Depends(get_db)):
+    return {"Zerpfy": "placeholder", "Antiqua": "placeholder", "SolarBuddhica": "placeholder"}
+
+
