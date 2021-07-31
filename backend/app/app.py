@@ -130,7 +130,7 @@ def show_orders_arrived_day(day, db: Session = Depends(get_db)):
 @app.get("/orders/manufacturer/total/{day}")
 def show_orders_manufacturer_total_day(day, db: Session = Depends(get_db)):
     statement = text("""
-    SELECT vaccine, SUM(injections) FROM orders WHERE arrived <= :day GROUP BY vaccine;
+    SELECT vaccine, COUNT(id) FROM orders WHERE arrived < :day GROUP BY vaccine;
     """)
     result = db.execute(statement, {'day': day}).all()
     return result
