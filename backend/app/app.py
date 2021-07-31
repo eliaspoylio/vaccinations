@@ -97,7 +97,20 @@ def show_vaccinations_used_day(day, db: Session = Depends(get_db)):
 
 @app.get("/orders/expired/{day}")
 def show_orders_expired_day(day, db: Session = Depends(get_db)):
-    return {"count": "placeholder"}
+    statement = text("""
+    WITH ordersused AS (
+    SELECT orders.id, arrived + interval '30 days' AS "expires", COUNT(vaccinations.sourceBottle) AS "used",
+    injections - COUNT(vaccinations.sourceBottle) AS "unused"
+    FROM orders
+    FULL OUTER JOIN vaccinations ON orders.id = vaccinations.sourceBottle
+    GROUP BY orders.id, orders.arrived, orders.injections
+    )
+    SELECT COUNT(id)
+    FROM ordersused
+    WHERE expires < :day;
+    """)
+    result = db.execute(statement, {'day': day}).all()
+    return result
 
 @app.get("/vaccinations/expired/{day}")
 def show_orders_arrived_day(day, db: Session = Depends(get_db)):
