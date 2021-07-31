@@ -48,7 +48,12 @@ def test_show_vaccinations_expired_day():
 def test_show_vaccinations_left_day():
     response = client.get("/vaccinations/left/2021-04-12T11:10:06.473587Z")
     assert response.status_code == 200
-    assert response.json() == [{"sum": 123456789}]
+    assert response.json() == [{"sum": 4090}]
+
+def test_show_vaccinations_expiring_tendays():
+    response = client.get("/vaccinations/expiring_tendays/20210223")
+    assert response.status_code == 200
+    assert response.json() == [{"sum": 1205}]
 
 def test_show_orders_arrived_day():
     response = client.get("/orders/day/2021-03-20")

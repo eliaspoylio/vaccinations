@@ -139,5 +139,28 @@ GROUP BY orders.id, orders.injections
 )
 SELECT SUM(vused)
 FROM injectionsused;
+
+---------------
+WITH injectionsused AS (
+SELECT orders.id, arrived + interval '30 days' AS "expires", orders.injections - COUNT(vaccinations.sourceBottle) AS "vunused"
+FROM orders
+INNER JOIN vaccinations ON orders.id = vaccinations.sourceBottle
+WHERE vaccinations.vaccinationDate <= '2021-04-12T11:10:06.473587Z'
+GROUP BY orders.id, orders.arrived, orders.injections
+)
+SELECT SUM(vunused)
+FROM injectionsused
+WHERE expires > '2021-04-12T11:10:06.473587Z';
+---------------
+WITH injectionsused AS (
+SELECT orders.id, arrived + interval '30 days' AS "expires", orders.injections - COUNT(vaccinations.sourceBottle) AS "vunused"
+FROM orders
+INNER JOIN vaccinations ON orders.id = vaccinations.sourceBottle
+WHERE vaccinations.vaccinationDate <= '20210223'
+GROUP BY orders.id, orders.arrived, orders.injections
+)
+SELECT SUM(vunused)
+FROM injectionsused
+WHERE expires < DATE('20210223') + interval '10' day AND expires > '20210223';
 ```
 

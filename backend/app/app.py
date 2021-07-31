@@ -131,7 +131,45 @@ def show_orders_arrived_day(day, db: Session = Depends(get_db)):
 
 @app.get("/vaccinations/left/{day}")
 def show_vaccinations_left_day(day, db: Session = Depends(get_db)):
-    return {"sum": "placeholder"}
+    statement = text("""
+    WITH injectionsused AS (
+    SELECT orders.id, arrived + interval '30 days' AS "expires", orders.injections - COUNT(vaccinations.sourceBottle) AS "vunused"
+    FROM orders
+    INNER JOIN vaccinations ON orders.id = vaccinations.sourceBottle
+    WHERE vaccinations.vaccinationDate <= :day
+    GROUP BY orders.id, orders.arrived, orders.injections
+    )
+    SELECT SUM(vunused)
+    FROM injectionsused
+    WHERE expires > :day;
+    """)
+    result = db.execute(statement, {'day': day}).all()
+    return result
+
+@app.get("/vaccinations/expiring_tendays/{day}")
+def test_show_vaccinations_expiring_tendays(day, db: Session = Depends(get_db)):
+    statement = text("""
+    WITH injectionsused AS (
+    SELECT orders.id, arrived + interval '30 days' AS "expires", orders.injections - COUNT(vaccinations.sourceBottle) AS "vunused"
+    FROM orders
+    INNER JOIN vaccinations ON orders.id = vaccinations.sourceBottle
+    WHERE vaccinations.vaccinationDate <= :day
+    GROUP BY orders.id, orders.arrived, orders.injections
+    )
+    SELECT SUM(vunused)
+    FROM injectionsused
+    WHERE expires < DATE(:day) + interval '10' day AND expires > :day;
+    """)
+    result = db.execute(statement, {'day': day}).all()
+    return result
+
+@app.get("/test/{day}")
+def test_show_vaccinations_expiring_tendays(day, db: Session = Depends(get_db)):
+    statement = text("""
+    SELECT DATE(:day) AS "dateday", DATE(:day) + interval '10' day AS "plusten", '2021-02-12 05:50:58.683047';
+    """)
+    result = db.execute(statement, {'day': day}).all()
+    return result
 
 @app.get("/orders/day/{day}")
 def show_orders_arrived_day(day, db: Session = Depends(get_db)):
