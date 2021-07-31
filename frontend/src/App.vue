@@ -87,7 +87,7 @@ export default {
 
       let ordTotal = `http://${this.apiUri}/orders/total/` + this.date;
 
-      let injTotal = `http://${this.apiUri}/injections/total/` + this.date;
+      let vacTotal = `http://${this.apiUri}/vaccinations/total/` + this.date;
 
       let vacUsed = `http://${this.apiUri}/vaccinations/used/` + this.date;
 
@@ -103,7 +103,7 @@ export default {
 
       const reqOrdTotal = axios.get(ordTotal);
 
-      const reqInjTotal = axios.get(injTotal);
+      const reqVacTotal = axios.get(vacTotal);
 
       const reqVacUsed = axios.get(vacUsed);
 
@@ -116,13 +116,9 @@ export default {
       const reqOrdDay = axios.get(ordDay);
 
       const reqByManuf = axios.get(byManuf);
-
-      console.log(this.apiUri)
-      console.log(injTotal)
       
-
       axios
-        .all([reqOrdTotal, reqInjTotal, reqVacUsed, reqOrdExp, reqVacExp, reqVacLeft, reqOrdDay, reqByManuf])
+        .all([reqOrdTotal, reqVacTotal, reqVacUsed, reqOrdExp, reqVacExp, reqVacLeft, reqOrdDay, reqByManuf])
         .then(
           axios.spread((...responses) => {
             this.loading = false;
@@ -131,10 +127,6 @@ export default {
             const resOrdDay = responses[1];
 
             const resVacUsed = responses[2];
-
-            console.log(respInjTotal.data[0].sum);
-            console.log(resOrdDay.data[0].count);
-            console.log(resVacUsed.data[0].sum);
 
             this.data = [
               respInjTotal.data[0].sum,

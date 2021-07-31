@@ -42,12 +42,10 @@ models.Base.metadata.create_all(bind=engine)
 async def root():
     return {"backend": "Hello world!"}
 
-
 @app.get("/orders/", response_model=List[schemas.Order])
 def show_orders(db: Session = Depends(get_db)):
     orders = db.query(models.Order).all()
     return orders
-
 
 @app.get("/vaccinations/", response_model=List[schemas.Vaccination])
 def show_vaccinations(db: Session = Depends(get_db)):
@@ -67,13 +65,19 @@ def show_orders_arrived_count(db: Session = Depends(get_db)):
     return result
 
 
-@app.get("/injections/total/{day}")
-def show_injections_arrived_total(day, db: Session = Depends(get_db)):
-    statement = select(func.sum(models.Order.injections)
-                       ).where(models.Order.arrived < day)
+@app.get("/orders/total/{day}")
+def show_orders_arrived_total(day, db: Session = Depends(get_db)):
+    statement = select(func.count(models.Order.id)
+                       ).where(models.Order.arrived <= day)
     result = db.execute(statement).all()
     return result
 
+@app.get("/vaccinations/total/{day}")
+def show_vaccinations_arrived_total(day, db: Session = Depends(get_db)):
+    statement = select(func.sum(models.Order.injections)
+                       ).where(models.Order.arrived <= day)
+    result = db.execute(statement).all()
+    return result
 
 @app.get("/orders/day/{day}")
 def show_orders_arrived_day(day, db: Session = Depends(get_db)):
@@ -97,7 +101,6 @@ def show_vaccinations_used_day(day, db: Session = Depends(get_db)):
     """)
     result = db.execute(statement, {'day': day}).all()
     return result
-
 
 @app.get("/vaccinations/expired/{day}")
 def show_orders_arrived_day(day, db: Session = Depends(get_db)):

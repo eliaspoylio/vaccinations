@@ -142,7 +142,7 @@ dmypy.json
 cython_debug/
 
 ######################
-#                    #
+#        env         #
 ######################
 .vscode
 .env
