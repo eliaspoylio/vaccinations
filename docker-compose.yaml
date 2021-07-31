@@ -30,3 +30,10 @@ services:
         depends_on:
           - "postgres"
         command: bash -c 'while !</dev/tcp/postgres/5432; do sleep 1; done; python main.py'
+    frontend:
+        build: ./frontend
+        restart: always
+        ports: 
+          - 3000:3000
+        volumes:
+          - ./frontend:/app
