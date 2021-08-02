@@ -37,6 +37,10 @@
           <td>How many vaccines are going to expire in the next 10 days</td>
           <td>{{ data[6] }}</td>
         </tr>
+        <tr>
+          <td>How many ordes arrived on this day</td>
+          <td>{{ data[7] }}</td>
+        </tr>
       </table>
       <table>
         <tr>
@@ -44,10 +48,13 @@
           <th>orders</th>
           <th>vaccines</th>
         </tr>
-        <tr v-for="manufacturer in data[8]" :key="manufacturer.vaccine">
+        <tr
+          v-for="(manufacturer, index) in data[8]"
+          :key="manufacturer.vaccine"
+        >
           <td>{{ manufacturer.vaccine }}</td>
           <td>{{ manufacturer.count }}</td>
-          <td></td>
+          <td>{{ data[9][index].sum }}</td>
         </tr>
       </table>
     </div>
@@ -71,7 +78,6 @@ export default {
   },
   methods: {
     getData() {
-      console.log(this.date);
       this.loading = true;
 
       let ordTotal = `http://${this.apiUri}/orders/total/` + this.date;
@@ -91,8 +97,11 @@ export default {
 
       let ordDay = `http://${this.apiUri}/orders/day/` + this.date;
 
-      let byManuf =
+      let ordByManuf =
         `http://${this.apiUri}/orders/manufacturer/total/` + this.date;
+
+      let vacByManuf =
+        `http://${this.apiUri}/vaccinations/manufacturer/total/` + this.date;
 
       const reqOrdTotal = axios.get(ordTotal);
 
@@ -110,7 +119,9 @@ export default {
 
       const reqOrdDay = axios.get(ordDay);
 
-      const reqByManuf = axios.get(byManuf);
+      const reqOrdByManuf = axios.get(ordByManuf);
+
+      const reqVacByManuf = axios.get(vacByManuf);
 
       axios
         .all([
@@ -122,13 +133,13 @@ export default {
           reqVacLeft,
           reqVacExpTen,
           reqOrdDay,
-          reqByManuf,
+          reqOrdByManuf,
+          reqVacByManuf,
         ])
         .then(
           axios.spread((...responses) => {
             this.loading = false;
-
-            console.log(responses);
+            this.errored = false;
 
             const resOrdTotal = responses[0];
 
@@ -146,7 +157,9 @@ export default {
 
             const resOrdDay = responses[7];
 
-            const resByManuf = responses[8];
+            const resOrdByManuf = responses[8];
+
+            const resVacByManuf = responses[9];
 
             this.data = [
               resOrdTotal.data[0].count,
@@ -155,14 +168,14 @@ export default {
               resOrdExp.data[0].count,
               resVacExp.data[0].sum,
               resVacLeft.data[0].sum,
-              resVacExpTen.data[0].count,
+              resVacExpTen.data[0].sum,
               resOrdDay.data[0].count,
-              resByManuf.data,
+              resOrdByManuf.data,
+              resVacByManuf.data,
             ];
           })
         )
-        .catch((errors) => {
-          console.log(errors);
+        .catch(() => {
           this.loading = false;
           this.errored = true;
         });

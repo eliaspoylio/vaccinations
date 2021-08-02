@@ -64,3 +64,8 @@ def test_show_orders_manufacturer_total_day():
     response = client.get("/orders/manufacturer/total/2021-04-12T11:10:06.473587Z")
     assert response.status_code == 200
     assert response.json() == [{"vaccine":"Antiqua","count":1661},{"vaccine":"SolarBuddhica","count":1676},{"vaccine":"Zerpfy","count":1663}]
+
+def test_show_vaccinations_manufacturer_total_day():
+    response = client.get("/vaccinations/manufacturer/total/2021-04-12")
+    assert response.status_code == 200
+    assert response.json() == [{"vaccine":"Antiqua","sum":6596},{"vaccine":"SolarBuddhica","sum":10014},{"vaccine":"Zerpfy","sum":8285}]
