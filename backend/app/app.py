@@ -185,3 +185,11 @@ def show_vaccinations_manufacturer_total_day(day, db: Session = Depends(get_db))
     """)
     result = db.execute(statement, {'day': day}).all()
     return result
+
+@app.get("/district/total/{day}")
+def show_district_total_day(day, db: Session = Depends(get_db)):
+    statement = text("""
+    SELECT healthcaredistrict, COUNT(id) AS orders, SUM(injections) AS injections FROM orders WHERE arrived <= :day GROUP BY healthcaredistrict ORDER BY healthcaredistrict;
+    """)
+    result = db.execute(statement, {'day': day}).all()
+    return result

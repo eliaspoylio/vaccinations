@@ -69,3 +69,8 @@ def test_show_vaccinations_manufacturer_total_day():
     response = client.get("/vaccinations/manufacturer/total/2021-04-12")
     assert response.status_code == 200
     assert response.json() == [{"vaccine":"Antiqua","sum":6596},{"vaccine":"SolarBuddhica","sum":10014},{"vaccine":"Zerpfy","sum":8285}]
+
+def test_show_district_total_day():
+    response = client.get("/district/total/2021-01-06")
+    assert response.status_code == 200
+    assert response.json() == [{"healthcaredistrict":"HYKS","orders":66,"injections":333},{"healthcaredistrict":"KYS","orders":21,"injections":103},{"healthcaredistrict":"OYS","orders":21,"injections":106},{"healthcaredistrict":"TAYS","orders":33,"injections":163},{"healthcaredistrict":"TYKS","orders":25,"injections":124}]
