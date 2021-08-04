@@ -5,8 +5,8 @@
         <input type="text" placeholder="date" v-model="date" />
       </div>
     </form>
-    <div class="alert alert-info" v-show="loading">Loading...</div>
-    <div class="alert alert-danger" v-show="errored">An error occured</div>
+    <div v-show="loading">Loading...</div>
+    <div v-show="errored">An error occured</div>
     <div class="data">
       <table>
         <tr>
@@ -23,41 +23,54 @@
         </tr>
         <tr>
           <td>How many bottles have expired</td>
-          <td></td>
+          <td>{{ data[3] }}</td>
         </tr>
         <tr>
           <td>How many vaccines expired before the usage</td>
-          <td></td>
+          <td>{{ data[4] }}</td>
         </tr>
         <tr>
           <td>How many vaccines are left to use</td>
-          <td></td>
+          <td>{{ data[5] }}</td>
         </tr>
         <tr>
           <td>How many vaccines are going to expire in the next 10 days</td>
-          <td></td>
+          <td>{{ data[6] }}</td>
+        </tr>
+        <tr>
+          <td>How many ordes arrived on this day</td>
+          <td>{{ data[7] }}</td>
+        </tr>
+      </table>
+
+      <table>
+        <tr>
+          <th>Producer</th>
+          <th>Orders</th>
+          <th>Vaccines</th>
+        </tr>
+        <tr
+          v-for="(manufacturer, index) in data[8]"
+          :key="manufacturer.vaccine"
+        >
+          <td>{{ manufacturer.vaccine }}</td>
+          <td>{{ manufacturer.count }}</td>
+          <td>{{ data[9][index].sum }}</td>
         </tr>
       </table>
       <table>
         <tr>
-          <th>Producer</th>
-          <th>orders</th>
-          <th>vaccines</th>
+          <th>Healthcare district</th>
+          <th>Orders</th>
+          <th>Vaccines</th>
         </tr>
-        <tr>
-          <td>Zerpfy</td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>Antiqua</td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>SolarBuddhica</td>
-          <td></td>
-          <td></td>
+        <tr
+          v-for="(district) in data[10]"
+          :key="district.healthcaredistrict"
+        >
+          <td>{{ district.healthcaredistrict }}</td>
+          <td>{{ district.orders }}</td>
+          <td>{{ district.injections }}</td>
         </tr>
       </table>
     </div>
@@ -76,14 +89,12 @@ export default {
       errored: false,
       date: "",
       data: [],
-      apiUri: process.env.VUE_APP_API_URI
+      apiUri: process.env.VUE_APP_API_URI,
     };
   },
   methods: {
     getData() {
-      console.log(this.date);
       this.loading = true;
-
 
       let ordTotal = `http://${this.apiUri}/orders/total/` + this.date;
 
@@ -97,9 +108,18 @@ export default {
 
       let vacLeft = `http://${this.apiUri}/vaccinations/left/` + this.date;
 
+      let vacExpTen =
+        `http://${this.apiUri}/vaccinations/expiring_tendays/` + this.date;
+
       let ordDay = `http://${this.apiUri}/orders/day/` + this.date;
 
-      let byManuf = `http://${this.apiUri}/orders/manufacturer/total/` + this.date;
+      let ordByManuf =
+        `http://${this.apiUri}/orders/manufacturer/total/` + this.date;
+
+      let vacByManuf =
+        `http://${this.apiUri}/vaccinations/manufacturer/total/` + this.date;
+
+      let district = `http://${this.apiUri}/district/total/` + this.date;
 
       const reqOrdTotal = axios.get(ordTotal);
 
@@ -113,30 +133,73 @@ export default {
 
       const reqVacLeft = axios.get(vacLeft);
 
+      const reqVacExpTen = axios.get(vacExpTen);
+
       const reqOrdDay = axios.get(ordDay);
 
-      const reqByManuf = axios.get(byManuf);
-      
+      const reqOrdByManuf = axios.get(ordByManuf);
+
+      const reqVacByManuf = axios.get(vacByManuf);
+
+      const reqDistrict = axios.get(district);
+
       axios
-        .all([reqOrdTotal, reqVacTotal, reqVacUsed, reqOrdExp, reqVacExp, reqVacLeft, reqOrdDay, reqByManuf])
+        .all([
+          reqOrdTotal,
+          reqVacTotal,
+          reqVacUsed,
+          reqOrdExp,
+          reqVacExp,
+          reqVacLeft,
+          reqVacExpTen,
+          reqOrdDay,
+          reqOrdByManuf,
+          reqVacByManuf,
+          reqDistrict,
+        ])
         .then(
           axios.spread((...responses) => {
             this.loading = false;
-            const respInjTotal = responses[0];
+            this.errored = false;
 
-            const resOrdDay = responses[1];
+            const resOrdTotal = responses[0];
+
+            const resVacTotal = responses[1];
 
             const resVacUsed = responses[2];
 
+            const resOrdExp = responses[3];
+
+            const resVacExp = responses[4];
+
+            const resVacLeft = responses[5];
+
+            const resVacExpTen = responses[6];
+
+            const resOrdDay = responses[7];
+
+            const resOrdByManuf = responses[8];
+
+            const resVacByManuf = responses[9];
+
+            const resDistrict = responses[10];
+
             this.data = [
-              respInjTotal.data[0].sum,
-              resOrdDay.data[0].count,
+              resOrdTotal.data[0].count,
+              resVacTotal.data[0].sum,
               resVacUsed.data[0].sum,
+              resOrdExp.data[0].count,
+              resVacExp.data[0].sum,
+              resVacLeft.data[0].sum,
+              resVacExpTen.data[0].sum,
+              resOrdDay.data[0].count,
+              resOrdByManuf.data,
+              resVacByManuf.data,
+              resDistrict.data,
             ];
           })
         )
-        .catch((errors) => {
-          console.log(errors);
+        .catch(() => {
           this.loading = false;
           this.errored = true;
         });
