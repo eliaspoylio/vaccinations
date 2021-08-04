@@ -5,8 +5,8 @@
         <input type="text" placeholder="date" v-model="date" />
       </div>
     </form>
-    <div class="alert alert-info" v-show="loading">Loading...</div>
-    <div class="alert alert-danger" v-show="errored">An error occured</div>
+    <div v-show="loading">Loading...</div>
+    <div v-show="errored">An error occured</div>
     <div class="data">
       <table>
         <tr>
@@ -42,11 +42,12 @@
           <td>{{ data[7] }}</td>
         </tr>
       </table>
+
       <table>
         <tr>
           <th>Producer</th>
-          <th>orders</th>
-          <th>vaccines</th>
+          <th>Orders</th>
+          <th>Vaccines</th>
         </tr>
         <tr
           v-for="(manufacturer, index) in data[8]"
@@ -55,6 +56,21 @@
           <td>{{ manufacturer.vaccine }}</td>
           <td>{{ manufacturer.count }}</td>
           <td>{{ data[9][index].sum }}</td>
+        </tr>
+      </table>
+      <table>
+        <tr>
+          <th>Healthcare district</th>
+          <th>Orders</th>
+          <th>Vaccines</th>
+        </tr>
+        <tr
+          v-for="(district) in data[10]"
+          :key="district.healthcaredistrict"
+        >
+          <td>{{ district.healthcaredistrict }}</td>
+          <td>{{ district.orders }}</td>
+          <td>{{ district.injections }}</td>
         </tr>
       </table>
     </div>
@@ -103,6 +119,8 @@ export default {
       let vacByManuf =
         `http://${this.apiUri}/vaccinations/manufacturer/total/` + this.date;
 
+      let district = `http://${this.apiUri}/district/total/` + this.date;
+
       const reqOrdTotal = axios.get(ordTotal);
 
       const reqVacTotal = axios.get(vacTotal);
@@ -123,6 +141,8 @@ export default {
 
       const reqVacByManuf = axios.get(vacByManuf);
 
+      const reqDistrict = axios.get(district);
+
       axios
         .all([
           reqOrdTotal,
@@ -135,6 +155,7 @@ export default {
           reqOrdDay,
           reqOrdByManuf,
           reqVacByManuf,
+          reqDistrict,
         ])
         .then(
           axios.spread((...responses) => {
@@ -161,6 +182,8 @@ export default {
 
             const resVacByManuf = responses[9];
 
+            const resDistrict = responses[10];
+
             this.data = [
               resOrdTotal.data[0].count,
               resVacTotal.data[0].sum,
@@ -172,6 +195,7 @@ export default {
               resOrdDay.data[0].count,
               resOrdByManuf.data,
               resVacByManuf.data,
+              resDistrict.data,
             ];
           })
         )
