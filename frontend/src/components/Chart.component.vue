@@ -1,7 +1,7 @@
 <template>
   <div class="example">
     <apexcharts
-      width="500"
+      width="100%"
       height="350"
       type="bar"
       :options="chartOptions"
@@ -34,6 +34,10 @@ export default {
           name: "Orders total",
           data: [],
         },
+        {
+          name: "Vaccinations total",
+          data: [],
+        },
       ],
     };
   },
@@ -44,13 +48,14 @@ export default {
   },
   methods: {
     changeData(districtData) {
-      //this.chartOptions.xaxis.categories = [];
-      //this.series.data = [];
+      console.log(districtData)
       let apiDistricts = [];
       let apiOrders = [];
+      let apiVaccinations = [];
       for (let i = 0; i < districtData.length; i++) {
         apiDistricts[i] = districtData[i].healthcaredistrict;
         apiOrders[i] = districtData[i].orders;
+        apiVaccinations[i] = districtData[i].injections;
       }
       this.chartOptions = {
         xaxis: {
@@ -61,6 +66,9 @@ export default {
         {
           data: apiOrders,
         },
+        {
+          data: apiVaccinations,
+        }
       ];
     },
   },

@@ -8,8 +8,6 @@
     <div v-show="loading">Loading...</div>
     <div v-show="errored">An error occured</div>
 
-    <Chart :districtData="data[10]"/>
-
     <div class="data">
       <table>
         <tr>
@@ -45,34 +43,41 @@
           <td>{{ data[7] }}</td>
         </tr>
       </table>
-
-      <table>
-        <tr>
-          <th>Producer</th>
-          <th>Orders</th>
-          <th>Vaccines</th>
-        </tr>
-        <tr
-          v-for="(manufacturer, index) in data[8]"
-          :key="manufacturer.vaccine"
-        >
-          <td>{{ manufacturer.vaccine }}</td>
-          <td>{{ manufacturer.count }}</td>
-          <td>{{ data[9][index].sum }}</td>
-        </tr>
-      </table>
-      <table>
-        <tr>
-          <th>Healthcare district</th>
-          <th>Orders</th>
-          <th>Vaccines</th>
-        </tr>
-        <tr v-for="district in data[10]" :key="district.healthcaredistrict">
-          <td>{{ district.healthcaredistrict }}</td>
-          <td>{{ district.orders }}</td>
-          <td>{{ district.injections }}</td>
-        </tr>
-      </table>
+      <div class="charts">
+        <div class="chart-table">
+          <Chart :districtData="data[10]" />
+          <table>
+            <tr>
+              <th>Producer</th>
+              <th>Orders</th>
+              <th>Vaccines</th>
+            </tr>
+            <tr
+              v-for="(manufacturer, index) in data[8]"
+              :key="manufacturer.vaccine"
+            >
+              <td>{{ manufacturer.vaccine }}</td>
+              <td>{{ manufacturer.count }}</td>
+              <td>{{ data[9][index].sum }}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="chart-table">
+            <Chart :districtData="data[10]" />
+          <table>
+            <tr>
+              <th>Healthcare district</th>
+              <th>Orders</th>
+              <th>Vaccines</th>
+            </tr>
+            <tr v-for="district in data[10]" :key="district.healthcaredistrict">
+              <td>{{ district.healthcaredistrict }}</td>
+              <td>{{ district.orders }}</td>
+              <td>{{ district.injections }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -218,6 +223,22 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.charts {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.chart-table {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.chartsrow {
+  flex-direction: row;
 }
 
 table {
