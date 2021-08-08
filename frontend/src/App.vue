@@ -7,6 +7,9 @@
     </form>
     <div v-show="loading">Loading...</div>
     <div v-show="errored">An error occured</div>
+
+    <Chart :districtData="data[10]"/>
+
     <div class="data">
       <table>
         <tr>
@@ -64,10 +67,7 @@
           <th>Orders</th>
           <th>Vaccines</th>
         </tr>
-        <tr
-          v-for="(district) in data[10]"
-          :key="district.healthcaredistrict"
-        >
+        <tr v-for="district in data[10]" :key="district.healthcaredistrict">
           <td>{{ district.healthcaredistrict }}</td>
           <td>{{ district.orders }}</td>
           <td>{{ district.injections }}</td>
@@ -79,16 +79,18 @@
 
 <script>
 import axios from "axios";
+import Chart from "./components/Chart.component.vue";
 
 export default {
   name: "app",
-  components: {},
+  components: { Chart },
   data() {
     return {
       loading: false,
       errored: false,
-      date: "",
+      date: "20210412",
       data: [],
+      districtData: [],
       apiUri: process.env.VUE_APP_API_URI,
     };
   },
