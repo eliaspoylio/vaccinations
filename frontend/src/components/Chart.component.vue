@@ -7,7 +7,6 @@
       :options="chartOptions"
       :series="series"
     ></apexcharts>
-    {{ districtData }}
   </div>
 </template>
 
@@ -21,26 +20,49 @@ export default {
     apexcharts: VueApexCharts,
   },
   data: function () {
-      
     return {
       chartOptions: {
         chart: {
-          id: "basic-bar",
+          id: "Healthcare district",
         },
         xaxis: {
-          categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998],
+          categories: [],
         },
       },
       series: [
         {
-          name: "series-1",
-          data: [30, 40, 45, 50, 49, 60, 70, 91],
+          name: "Orders total",
+          data: [],
         },
       ],
     };
   },
-  test(districtData) {
-    console.log(districtData);
+  watch: {
+    districtData(val) {
+      this.changeData(val);
+    },
+  },
+  methods: {
+    changeData(districtData) {
+      //this.chartOptions.xaxis.categories = [];
+      //this.series.data = [];
+      let apiDistricts = [];
+      let apiOrders = [];
+      for (let i = 0; i < districtData.length; i++) {
+        apiDistricts[i] = districtData[i].healthcaredistrict;
+        apiOrders[i] = districtData[i].orders;
+      }
+      this.chartOptions = {
+        xaxis: {
+          categories: apiDistricts,
+        },
+      };
+      this.series = [
+        {
+          data: apiOrders,
+        },
+      ];
+    },
   },
 };
 </script>
