@@ -35,7 +35,7 @@ export default {
           data: [],
         },
         {
-          name: "Vaccinations total",
+          name: "Injections total",
           data: [],
         },
       ],
@@ -47,27 +47,27 @@ export default {
     },
   },
   methods: {
-    changeData(districtData) {
-      console.log(districtData)
-      let apiDistricts = [];
-      let apiOrders = [];
-      let apiVaccinations = [];
-      for (let i = 0; i < districtData.length; i++) {
-        apiDistricts[i] = districtData[i].healthcaredistrict;
-        apiOrders[i] = districtData[i].orders;
-        apiVaccinations[i] = districtData[i].injections;
+    changeData(data) {
+      let resKey = [];
+      let resOrders = [];
+      let resVaccinations = [];
+      for (let i = 0; i < data.length; i++) {
+        // key changes by request/response
+        resKey[i] = data[i][Object.keys(data[i])[0]];
+        resOrders[i] = data[i].orders;
+        resVaccinations[i] = data[i].injections;
       }
       this.chartOptions = {
         xaxis: {
-          categories: apiDistricts,
+          categories: resKey,
         },
       };
       this.series = [
         {
-          data: apiOrders,
+          data: resOrders,
         },
         {
-          data: apiVaccinations,
+          data: resVaccinations,
         }
       ];
     },

@@ -45,7 +45,7 @@
       </table>
       <div class="charts">
         <div class="chart-table">
-          <Chart :districtData="data[10]" />
+          <Chart :districtData="data[8]" />
           <table>
             <tr>
               <th>Producer</th>
@@ -53,24 +53,24 @@
               <th>Vaccines</th>
             </tr>
             <tr
-              v-for="(manufacturer, index) in data[8]"
+              v-for="(manufacturer) in data[8]"
               :key="manufacturer.vaccine"
             >
               <td>{{ manufacturer.vaccine }}</td>
-              <td>{{ manufacturer.count }}</td>
-              <td>{{ data[9][index].sum }}</td>
+              <td>{{ manufacturer.orders }}</td>
+              <td>{{ manufacturer.injections }}</td>
             </tr>
           </table>
         </div>
         <div class="chart-table">
-            <Chart :districtData="data[10]" />
+            <Chart :districtData="data[9]" />
           <table>
             <tr>
               <th>Healthcare district</th>
               <th>Orders</th>
               <th>Vaccines</th>
             </tr>
-            <tr v-for="district in data[10]" :key="district.healthcaredistrict">
+            <tr v-for="district in data[9]" :key="district.healthcaredistrict">
               <td>{{ district.healthcaredistrict }}</td>
               <td>{{ district.orders }}</td>
               <td>{{ district.injections }}</td>
@@ -120,11 +120,8 @@ export default {
 
       let ordDay = `http://${this.apiUri}/orders/day/` + this.date;
 
-      let ordByManuf =
-        `http://${this.apiUri}/orders/manufacturer/total/` + this.date;
-
-      let vacByManuf =
-        `http://${this.apiUri}/vaccinations/manufacturer/total/` + this.date;
+      let manufacturer =
+        `http://${this.apiUri}/manufacturer/total/` + this.date;
 
       let district = `http://${this.apiUri}/district/total/` + this.date;
 
@@ -144,9 +141,7 @@ export default {
 
       const reqOrdDay = axios.get(ordDay);
 
-      const reqOrdByManuf = axios.get(ordByManuf);
-
-      const reqVacByManuf = axios.get(vacByManuf);
+      const reqManufacturer = axios.get(manufacturer);
 
       const reqDistrict = axios.get(district);
 
@@ -160,8 +155,7 @@ export default {
           reqVacLeft,
           reqVacExpTen,
           reqOrdDay,
-          reqOrdByManuf,
-          reqVacByManuf,
+          reqManufacturer,
           reqDistrict,
         ])
         .then(
@@ -185,11 +179,10 @@ export default {
 
             const resOrdDay = responses[7];
 
-            const resOrdByManuf = responses[8];
+            const resManufacturer = responses[8];
 
-            const resVacByManuf = responses[9];
+            const resDistrict = responses[9];
 
-            const resDistrict = responses[10];
 
             this.data = [
               resOrdTotal.data[0].count,
@@ -200,8 +193,7 @@ export default {
               resVacLeft.data[0].sum,
               resVacExpTen.data[0].sum,
               resOrdDay.data[0].count,
-              resOrdByManuf.data,
-              resVacByManuf.data,
+              resManufacturer.data,
               resDistrict.data,
             ];
           })
