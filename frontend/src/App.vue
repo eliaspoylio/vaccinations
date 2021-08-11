@@ -1,23 +1,38 @@
 <template>
   <div id="app">
-    <form action="#" @submit.prevent="getData">
-      <div class="form-group">
-         <button type="submit">
-            Get data for day
-        </button>
+    <div class="panel">
+      <div class="controls">
+        <form action="#" @submit.prevent="getData">
+          <div class="form-group">
+            <button type="submit">Get data for day</button>
+          </div>
+        </form>
+
+        <datepicker
+          v-model="picked"
+          :upperLimit="to"
+          :lowerLimit="from"
+          :monthHeadingFormat="outputFormat"
+          :typeable="true"
+        />
+
+        <div v-show="loading">Loading...</div>
+        <div v-show="errored">An error occured</div>
+        <div v-show="ok">Ok</div>
       </div>
-    </form>
 
-    <datepicker
-      v-model="picked"
-      :upperLimit="to"
-      :lowerLimit="from"
-      :monthHeadingFormat="outputFormat"
-      :typeable=true
-    />
-
-    <div v-show="loading">Loading...</div>
-    <div v-show="errored">An error occured</div>
+      <div class="info">
+        <p>
+          Run a manual sweep of anomalous airborne or electromagnetic readings.
+          Radiation levels in our atmosphere have increased by 3,000 percent.
+          Electromagnetic and subspace wave fronts approaching synchronization.
+          What is the strength of the ship's deflector shields at maximum
+          output? The wormhole's size and short period would make this a local
+          phenomenon. Do you have sufficient data to compile a holographic
+          simulation?
+        </p>
+      </div>
+    </div>
 
     <div class="data">
       <table>
@@ -54,37 +69,37 @@
           <td>{{ data[7] }}</td>
         </tr>
       </table>
-      <div class="charts">
-        <div class="chart-table">
-          <Chart :visualData="data[8]" />
-          <table>
-            <tr>
-              <th>Producer</th>
-              <th>Orders</th>
-              <th>Vaccines</th>
-            </tr>
-            <tr v-for="manufacturer in data[8]" :key="manufacturer.vaccine">
-              <td>{{ manufacturer.vaccine }}</td>
-              <td>{{ manufacturer.orders }}</td>
-              <td>{{ manufacturer.injections }}</td>
-            </tr>
-          </table>
-        </div>
-        <div class="chart-table">
-          <Chart :visualData="data[9]" />
-          <table>
-            <tr>
-              <th>Healthcare district</th>
-              <th>Orders</th>
-              <th>Vaccines</th>
-            </tr>
-            <tr v-for="district in data[9]" :key="district.healthcaredistrict">
-              <td>{{ district.healthcaredistrict }}</td>
-              <td>{{ district.orders }}</td>
-              <td>{{ district.injections }}</td>
-            </tr>
-          </table>
-        </div>
+    </div>
+    <div class="charts">
+      <div class="chart-table">
+        <Chart :visualData="data[8]" />
+        <table>
+          <tr>
+            <th>Producer</th>
+            <th>Orders</th>
+            <th>Vaccines</th>
+          </tr>
+          <tr v-for="manufacturer in data[8]" :key="manufacturer.vaccine">
+            <td>{{ manufacturer.vaccine }}</td>
+            <td>{{ manufacturer.orders }}</td>
+            <td>{{ manufacturer.injections }}</td>
+          </tr>
+        </table>
+      </div>
+      <div class="chart-table">
+        <Chart :visualData="data[9]" />
+        <table>
+          <tr>
+            <th>Healthcare district</th>
+            <th>Orders</th>
+            <th>Vaccines</th>
+          </tr>
+          <tr v-for="district in data[9]" :key="district.healthcaredistrict">
+            <td>{{ district.healthcaredistrict }}</td>
+            <td>{{ district.orders }}</td>
+            <td>{{ district.injections }}</td>
+          </tr>
+        </table>
       </div>
     </div>
   </div>
@@ -103,6 +118,7 @@ export default {
     return {
       loading: false,
       errored: false,
+      ok: true,
       date: "20210412",
       data: [],
       visualData: [],
@@ -115,31 +131,34 @@ export default {
   },
   methods: {
     getData() {
-      let pickedDate = moment(this.picked).format("YYYY-MM-DD HH:mm:ss").toString();
+      let time = "23:59";
+      let pickedDate = moment(this.picked).format("YYYY-MM-DD").toString();
+      let timeAndDate = pickedDate + " " + time;
 
+      this.ok = false;
       this.loading = true;
 
-      let ordTotal = `http://${this.apiUri}/orders/total/` + pickedDate;
+      let ordTotal = `http://${this.apiUri}/orders/total/` + timeAndDate;
 
-      let vacTotal = `http://${this.apiUri}/vaccinations/total/` + pickedDate;
+      let vacTotal = `http://${this.apiUri}/vaccinations/total/` + timeAndDate;
 
-      let vacUsed = `http://${this.apiUri}/vaccinations/used/` + pickedDate;
+      let vacUsed = `http://${this.apiUri}/vaccinations/used/` + timeAndDate;
 
-      let ordExp = `http://${this.apiUri}/orders/expired/` + pickedDate;
+      let ordExp = `http://${this.apiUri}/orders/expired/` + timeAndDate;
 
-      let vacExp = `http://${this.apiUri}/vaccinations/expired/` + pickedDate;
+      let vacExp = `http://${this.apiUri}/vaccinations/expired/` + timeAndDate;
 
-      let vacLeft = `http://${this.apiUri}/vaccinations/left/` + pickedDate;
+      let vacLeft = `http://${this.apiUri}/vaccinations/left/` + timeAndDate;
 
       let vacExpTen =
-        `http://${this.apiUri}/vaccinations/expiring_tendays/` + pickedDate;
+        `http://${this.apiUri}/vaccinations/expiring_tendays/` + timeAndDate;
 
-      let ordDay = `http://${this.apiUri}/orders/day/` + pickedDate;
+      let ordDay = `http://${this.apiUri}/orders/day/` + timeAndDate;
 
       let manufacturer =
-        `http://${this.apiUri}/manufacturer/total/` + pickedDate;
+        `http://${this.apiUri}/manufacturer/total/` + timeAndDate;
 
-      let district = `http://${this.apiUri}/district/total/` + pickedDate;
+      let district = `http://${this.apiUri}/district/total/` + timeAndDate;
 
       const reqOrdTotal = axios.get(ordTotal);
 
@@ -178,6 +197,7 @@ export default {
           axios.spread((...responses) => {
             this.loading = false;
             this.errored = false;
+            this.ok = true;
 
             const resOrdTotal = responses[0];
 
@@ -231,20 +251,40 @@ export default {
   margin-top: 60px;
 }
 
+.panel {
+  padding: 5%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  max-width: 100%;
+}
+
+.controls {
+  background: #dddddd;
+  padding: 5%;
+}
+
+.info {
+  background: #dddddd;
+  padding: 5%;
+  max-width: 50%;
+}
+
+.data {
+  padding: 5%;
+}
+
 .charts {
   display: flex;
   flex-direction: row;
-  width: 100%;
+  max-width: 100%;
 }
 
 .chart-table {
   display: flex;
   flex-direction: column;
   width: 50%;
-}
-
-.chartsrow {
-  flex-direction: row;
+  padding: 5%;
 }
 
 table {
