@@ -15,7 +15,7 @@ import VueApexCharts from "vue3-apexcharts";
 
 export default {
   name: "Chart",
-  props: { districtData: Array },
+  props: { visualData: Array },
   components: {
     apexcharts: VueApexCharts,
   },
@@ -42,7 +42,7 @@ export default {
     };
   },
   watch: {
-    districtData(val) {
+    visualData(val) {
       this.changeData(val);
     },
   },

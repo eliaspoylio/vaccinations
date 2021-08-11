@@ -2,11 +2,19 @@
   <div id="app">
     <form action="#" @submit.prevent="getData">
       <div class="form-group">
-        <input type="text" placeholder="date" v-model="date" />
+         <button type="submit">
+            Get data for day
+        </button>
       </div>
     </form>
-    
-    <datepicker v-model="picked" />
+
+    <datepicker
+      v-model="picked"
+      :upperLimit="to"
+      :lowerLimit="from"
+      :monthHeadingFormat="outputFormat"
+      :typeable=true
+    />
 
     <div v-show="loading">Loading...</div>
     <div v-show="errored">An error occured</div>
@@ -48,17 +56,14 @@
       </table>
       <div class="charts">
         <div class="chart-table">
-          <Chart :districtData="data[8]" />
+          <Chart :visualData="data[8]" />
           <table>
             <tr>
               <th>Producer</th>
               <th>Orders</th>
               <th>Vaccines</th>
             </tr>
-            <tr
-              v-for="(manufacturer) in data[8]"
-              :key="manufacturer.vaccine"
-            >
+            <tr v-for="manufacturer in data[8]" :key="manufacturer.vaccine">
               <td>{{ manufacturer.vaccine }}</td>
               <td>{{ manufacturer.orders }}</td>
               <td>{{ manufacturer.injections }}</td>
@@ -66,7 +71,7 @@
           </table>
         </div>
         <div class="chart-table">
-            <Chart :districtData="data[9]" />
+          <Chart :visualData="data[9]" />
           <table>
             <tr>
               <th>Healthcare district</th>
@@ -88,7 +93,8 @@
 <script>
 import axios from "axios";
 import Chart from "./components/Chart.component.vue";
-import Datepicker from 'vue3-datepicker'
+import Datepicker from "vue3-datepicker";
+import moment from "moment";
 
 export default {
   name: "app",
@@ -99,36 +105,41 @@ export default {
       errored: false,
       date: "20210412",
       data: [],
-      districtData: [],
+      visualData: [],
       apiUri: process.env.VUE_APP_API_URI,
-      picked: new Date(),
+      picked: new Date(2021, 3, 12),
+      to: new Date(2021, 3, 12),
+      from: new Date(2021, 0, 2),
+      outputFormat: "yyyy-MM-dd",
     };
   },
   methods: {
     getData() {
+      let pickedDate = moment(this.picked).format("YYYY-MM-DD HH:mm:ss").toString();
+
       this.loading = true;
 
-      let ordTotal = `http://${this.apiUri}/orders/total/` + this.date;
+      let ordTotal = `http://${this.apiUri}/orders/total/` + pickedDate;
 
-      let vacTotal = `http://${this.apiUri}/vaccinations/total/` + this.date;
+      let vacTotal = `http://${this.apiUri}/vaccinations/total/` + pickedDate;
 
-      let vacUsed = `http://${this.apiUri}/vaccinations/used/` + this.date;
+      let vacUsed = `http://${this.apiUri}/vaccinations/used/` + pickedDate;
 
-      let ordExp = `http://${this.apiUri}/orders/expired/` + this.date;
+      let ordExp = `http://${this.apiUri}/orders/expired/` + pickedDate;
 
-      let vacExp = `http://${this.apiUri}/vaccinations/expired/` + this.date;
+      let vacExp = `http://${this.apiUri}/vaccinations/expired/` + pickedDate;
 
-      let vacLeft = `http://${this.apiUri}/vaccinations/left/` + this.date;
+      let vacLeft = `http://${this.apiUri}/vaccinations/left/` + pickedDate;
 
       let vacExpTen =
-        `http://${this.apiUri}/vaccinations/expiring_tendays/` + this.date;
+        `http://${this.apiUri}/vaccinations/expiring_tendays/` + pickedDate;
 
-      let ordDay = `http://${this.apiUri}/orders/day/` + this.date;
+      let ordDay = `http://${this.apiUri}/orders/day/` + pickedDate;
 
       let manufacturer =
-        `http://${this.apiUri}/manufacturer/total/` + this.date;
+        `http://${this.apiUri}/manufacturer/total/` + pickedDate;
 
-      let district = `http://${this.apiUri}/district/total/` + this.date;
+      let district = `http://${this.apiUri}/district/total/` + pickedDate;
 
       const reqOrdTotal = axios.get(ordTotal);
 
@@ -188,7 +199,6 @@ export default {
 
             const resDistrict = responses[9];
 
-
             this.data = [
               resOrdTotal.data[0].count,
               resVacTotal.data[0].sum,
@@ -217,7 +227,6 @@ export default {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
   margin-top: 60px;
 }
