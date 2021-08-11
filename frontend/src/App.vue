@@ -5,6 +5,9 @@
         <input type="text" placeholder="date" v-model="date" />
       </div>
     </form>
+    
+    <datepicker v-model="picked" />
+
     <div v-show="loading">Loading...</div>
     <div v-show="errored">An error occured</div>
 
@@ -85,10 +88,11 @@
 <script>
 import axios from "axios";
 import Chart from "./components/Chart.component.vue";
+import Datepicker from 'vue3-datepicker'
 
 export default {
   name: "app",
-  components: { Chart },
+  components: { Chart, Datepicker },
   data() {
     return {
       loading: false,
@@ -97,6 +101,7 @@ export default {
       data: [],
       districtData: [],
       apiUri: process.env.VUE_APP_API_URI,
+      picked: new Date(),
     };
   },
   methods: {
