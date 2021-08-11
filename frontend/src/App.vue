@@ -7,6 +7,7 @@
     </form>
     <div v-show="loading">Loading...</div>
     <div v-show="errored">An error occured</div>
+
     <div class="data">
       <table>
         <tr>
@@ -42,53 +43,59 @@
           <td>{{ data[7] }}</td>
         </tr>
       </table>
-
-      <table>
-        <tr>
-          <th>Producer</th>
-          <th>Orders</th>
-          <th>Vaccines</th>
-        </tr>
-        <tr
-          v-for="(manufacturer, index) in data[8]"
-          :key="manufacturer.vaccine"
-        >
-          <td>{{ manufacturer.vaccine }}</td>
-          <td>{{ manufacturer.count }}</td>
-          <td>{{ data[9][index].sum }}</td>
-        </tr>
-      </table>
-      <table>
-        <tr>
-          <th>Healthcare district</th>
-          <th>Orders</th>
-          <th>Vaccines</th>
-        </tr>
-        <tr
-          v-for="(district) in data[10]"
-          :key="district.healthcaredistrict"
-        >
-          <td>{{ district.healthcaredistrict }}</td>
-          <td>{{ district.orders }}</td>
-          <td>{{ district.injections }}</td>
-        </tr>
-      </table>
+      <div class="charts">
+        <div class="chart-table">
+          <Chart :districtData="data[8]" />
+          <table>
+            <tr>
+              <th>Producer</th>
+              <th>Orders</th>
+              <th>Vaccines</th>
+            </tr>
+            <tr
+              v-for="(manufacturer) in data[8]"
+              :key="manufacturer.vaccine"
+            >
+              <td>{{ manufacturer.vaccine }}</td>
+              <td>{{ manufacturer.orders }}</td>
+              <td>{{ manufacturer.injections }}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="chart-table">
+            <Chart :districtData="data[9]" />
+          <table>
+            <tr>
+              <th>Healthcare district</th>
+              <th>Orders</th>
+              <th>Vaccines</th>
+            </tr>
+            <tr v-for="district in data[9]" :key="district.healthcaredistrict">
+              <td>{{ district.healthcaredistrict }}</td>
+              <td>{{ district.orders }}</td>
+              <td>{{ district.injections }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import Chart from "./components/Chart.component.vue";
 
 export default {
   name: "app",
-  components: {},
+  components: { Chart },
   data() {
     return {
       loading: false,
       errored: false,
-      date: "",
+      date: "20210412",
       data: [],
+      districtData: [],
       apiUri: process.env.VUE_APP_API_URI,
     };
   },
@@ -113,11 +120,8 @@ export default {
 
       let ordDay = `http://${this.apiUri}/orders/day/` + this.date;
 
-      let ordByManuf =
-        `http://${this.apiUri}/orders/manufacturer/total/` + this.date;
-
-      let vacByManuf =
-        `http://${this.apiUri}/vaccinations/manufacturer/total/` + this.date;
+      let manufacturer =
+        `http://${this.apiUri}/manufacturer/total/` + this.date;
 
       let district = `http://${this.apiUri}/district/total/` + this.date;
 
@@ -137,9 +141,7 @@ export default {
 
       const reqOrdDay = axios.get(ordDay);
 
-      const reqOrdByManuf = axios.get(ordByManuf);
-
-      const reqVacByManuf = axios.get(vacByManuf);
+      const reqManufacturer = axios.get(manufacturer);
 
       const reqDistrict = axios.get(district);
 
@@ -153,8 +155,7 @@ export default {
           reqVacLeft,
           reqVacExpTen,
           reqOrdDay,
-          reqOrdByManuf,
-          reqVacByManuf,
+          reqManufacturer,
           reqDistrict,
         ])
         .then(
@@ -178,11 +179,10 @@ export default {
 
             const resOrdDay = responses[7];
 
-            const resOrdByManuf = responses[8];
+            const resManufacturer = responses[8];
 
-            const resVacByManuf = responses[9];
+            const resDistrict = responses[9];
 
-            const resDistrict = responses[10];
 
             this.data = [
               resOrdTotal.data[0].count,
@@ -193,8 +193,7 @@ export default {
               resVacLeft.data[0].sum,
               resVacExpTen.data[0].sum,
               resOrdDay.data[0].count,
-              resOrdByManuf.data,
-              resVacByManuf.data,
+              resManufacturer.data,
               resDistrict.data,
             ];
           })
@@ -216,6 +215,22 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.charts {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.chart-table {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.chartsrow {
+  flex-direction: row;
 }
 
 table {
