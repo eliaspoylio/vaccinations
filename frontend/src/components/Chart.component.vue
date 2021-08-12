@@ -1,11 +1,14 @@
 <template>
-    <apexcharts
-      width="100%"
-      height="350"
-      type="bar"
-      :options="chartOptions"
-      :series="series"
-    ></apexcharts>
+<div>
+<h3>{{ title }}</h3>
+  <apexcharts
+    width="100%"
+    height="350"
+    type="bar"
+    :options="chartOptions"
+    :series="series"
+  ></apexcharts>
+</div>
 </template>
 
 <script>
@@ -13,7 +16,7 @@ import VueApexCharts from "vue3-apexcharts";
 
 export default {
   name: "Chart",
-  props: { visualData: Array },
+  props: { visualData: Array, title: String },
   components: {
     apexcharts: VueApexCharts,
   },
@@ -21,11 +24,12 @@ export default {
     return {
       chartOptions: {
         chart: {
-          id: "Healthcare district",
+          id: "id",
         },
         xaxis: {
           categories: [],
         },
+        colors: ["#601a4a", "#ee442f", "#63acbe"],
       },
       series: [
         {
@@ -66,7 +70,7 @@ export default {
         },
         {
           data: resVaccinations,
-        }
+        },
       ];
     },
   },

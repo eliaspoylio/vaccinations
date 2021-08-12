@@ -36,12 +36,12 @@
 
     <div class="charts">
       <div class="chart-table">
-        <Chart :visualData="data[8]" />
+        <Chart :visualData="data[8]" :title="titles[0]" />
         <table>
           <tr>
             <th>Producer</th>
             <th>Orders</th>
-            <th>Vaccines</th>
+            <th>Injections</th>
           </tr>
           <tr v-for="manufacturer in data[8]" :key="manufacturer.vaccine">
             <td>{{ manufacturer.vaccine }}</td>
@@ -51,12 +51,12 @@
         </table>
       </div>
       <div class="chart-table">
-        <Chart :visualData="data[9]" />
+        <Chart :visualData="data[9]" :title="titles[1]" />
         <table>
           <tr>
             <th>Healthcare district</th>
             <th>Orders</th>
-            <th>Vaccines</th>
+            <th>Injections</th>
           </tr>
           <tr v-for="district in data[9]" :key="district.healthcaredistrict">
             <td>{{ district.healthcaredistrict }}</td>
@@ -95,6 +95,7 @@ export default {
       to: new Date(2021, 3, 12),
       from: new Date(2021, 0, 2),
       outputFormat: "yyyy-MM-dd",
+      titles: ["Orders and injections by manufacturer", "Orders and injections by healthcare district"]
     };
   },
   methods: {
@@ -212,12 +213,16 @@ export default {
 </script>
 
 <style>
+body {
+  background: #e9e4dc;
+}
+
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  margin-top: 60px;
+  background: #f9f4ec;
 }
 
 .panel {
@@ -229,18 +234,22 @@ export default {
 }
 
 .controls {
-  background: #dddddd;
-  padding: 5%;
+  background: #e9e4dc;
+  padding: 2%;
+  outline-style: dotted;
+  outline-color: #e9e4dc;
 }
 
 .info {
-  background: #dddddd;
-  padding: 5%;
+  background: #e9e4dc;
+  padding: 2%;
   max-width: 50%;
+  outline-style: dotted;
+  outline-color: #e9e4dc;
 }
 
 .data {
-  padding: 5%;
+  padding: 2%;
 }
 
 .charts {
@@ -253,7 +262,7 @@ export default {
   display: flex;
   flex-direction: column;
   width: 50%;
-  padding: 5%;
+  padding: 2%;
 }
 
 table {
@@ -264,12 +273,12 @@ table {
 
 td,
 th {
-  border: 1px solid #dddddd;
+  border: 1px solid #e9e4dc;
   text-align: left;
   padding: 8px;
 }
 
 tr:nth-child(even) {
-  background-color: #dddddd;
+  background-color: #e9e4dc;
 }
 </style>
