@@ -16,7 +16,10 @@ VUE_APP_API_URI=localhost:8080
 ``` 
 `docker-compose --env-file .env up --build`
 
+http://127.0.0.1:8080/docs
+
 `chmod 777 test.sh`
 `chmod 777 psql.sh`
 
 `docker-compose down`
+
