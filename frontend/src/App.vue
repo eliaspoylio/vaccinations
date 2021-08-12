@@ -80,7 +80,9 @@
       <Donut :visualData="data[10]" :title="titles[3]" />
       </div>
     </div>
+    <div class="data">
     <Line :visualData="mountData[0]" :title="titles[4]" />
+    </div>
   </div>
 </template>
 
@@ -107,8 +109,8 @@ export default {
       visualData: [],
       apiUri: process.env.VUE_APP_API_URI,
       picked: new Date(2021, 3, 12),
-      to: new Date(2021, 3, 12),
-      from: new Date(2021, 0, 2),
+      from: new Date(),
+      to: new Date(),
       outputFormat: "yyyy-MM-dd",
       appt: "23:59",
       titles: [
@@ -116,7 +118,7 @@ export default {
         "Orders and injections by healthcare district",
         "Situation on given time",
         "Gender of persons vaccinated on given day",
-        "Time series",
+        "Time series of orders, injections and vaccinations",
       ],
     };
   },
@@ -134,6 +136,11 @@ export default {
           const resTimeSeries = responses[0];
 
           this.mountData = [resTimeSeries.data];
+
+          // set limits to date picker from time series data
+          this.from = new Date(this.mountData[0][0].day);
+          this.to = new Date(this.mountData[0][this.mountData[0].length - 1].day);
+          this.picked = new Date(this.mountData[0][this.mountData[0].length - 1].day);
         })
       )
       .catch(() => {
@@ -143,6 +150,7 @@ export default {
   },
   methods: {
     getData() {
+      // set date to correct format and concat date and time
       let pickedDate = moment(this.picked).format("YYYY-MM-DD").toString();
       let timeAndDate = pickedDate + " " + this.appt;
 

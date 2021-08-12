@@ -3,7 +3,7 @@
     <h3>{{ title }}</h3>
     <apexcharts
       width="100%"
-      height="350"
+      height="450"
       type="line"
       :options="chartOptions"
       :series="series"
