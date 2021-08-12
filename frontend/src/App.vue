@@ -18,7 +18,7 @@
 
         <div v-show="loading">Loading...</div>
         <div v-show="errored">An error occured</div>
-        <div v-show="ok">Ok</div>
+        <div v-show="ok"></div>
       </div>
 
       <div class="info">
@@ -34,42 +34,6 @@
       </div>
     </div>
 
-    <div class="data">
-      <table>
-        <tr>
-          <td>How many orders have arrived total</td>
-          <td>{{ data[0] }}</td>
-        </tr>
-        <tr>
-          <td>How many vaccines have arrived total</td>
-          <td>{{ data[1] }}</td>
-        </tr>
-        <tr>
-          <td>How many of the vaccinations have been used</td>
-          <td>{{ data[2] }}</td>
-        </tr>
-        <tr>
-          <td>How many bottles have expired</td>
-          <td>{{ data[3] }}</td>
-        </tr>
-        <tr>
-          <td>How many vaccines expired before the usage</td>
-          <td>{{ data[4] }}</td>
-        </tr>
-        <tr>
-          <td>How many vaccines are left to use</td>
-          <td>{{ data[5] }}</td>
-        </tr>
-        <tr>
-          <td>How many vaccines are going to expire in the next 10 days</td>
-          <td>{{ data[6] }}</td>
-        </tr>
-        <tr>
-          <td>How many ordes arrived on this day</td>
-          <td>{{ data[7] }}</td>
-        </tr>
-      </table>
-    </div>
     <div class="charts">
       <div class="chart-table">
         <Chart :visualData="data[8]" />
@@ -102,18 +66,22 @@
         </table>
       </div>
     </div>
+    <div class="data">
+      <DataTable :tableData="data" />
+    </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
 import Chart from "./components/Chart.component.vue";
+import DataTable from "./components/DataTable.component.vue";
 import Datepicker from "vue3-datepicker";
 import moment from "moment";
 
 export default {
   name: "app",
-  components: { Chart, Datepicker },
+  components: { Chart, DataTable, Datepicker },
   data() {
     return {
       loading: false,
@@ -131,7 +99,8 @@ export default {
   },
   methods: {
     getData() {
-      let time = "23:59";
+      //time is set to end of the day to get data for the whole day
+      let time = "23:59:59";
       let pickedDate = moment(this.picked).format("YYYY-MM-DD").toString();
       let timeAndDate = pickedDate + " " + time;
 

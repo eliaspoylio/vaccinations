@@ -1,5 +1,4 @@
 <template>
-  <div class="example">
     <apexcharts
       width="100%"
       height="350"
@@ -7,7 +6,6 @@
       :options="chartOptions"
       :series="series"
     ></apexcharts>
-  </div>
 </template>
 
 <script>
