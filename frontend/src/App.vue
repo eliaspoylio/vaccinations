@@ -6,15 +6,17 @@
           <div class="form-group">
             <button type="submit">Get data for day</button>
           </div>
+          <p>Date</p>
+          <datepicker
+            v-model="picked"
+            :upperLimit="to"
+            :lowerLimit="from"
+            :monthHeadingFormat="outputFormat"
+            :typeable="true"
+          />
+          <p>Time</p>
+            <input v-model="appt" type="time" id="appt" name="appt">
         </form>
-
-        <datepicker
-          v-model="picked"
-          :upperLimit="to"
-          :lowerLimit="from"
-          :monthHeadingFormat="outputFormat"
-          :typeable="true"
-        />
 
         <div v-show="loading">Loading...</div>
         <div v-show="errored">An error occured</div>
@@ -95,15 +97,18 @@ export default {
       to: new Date(2021, 3, 12),
       from: new Date(2021, 0, 2),
       outputFormat: "yyyy-MM-dd",
-      titles: ["Orders and injections by manufacturer", "Orders and injections by healthcare district"]
+      appt: "23:59",
+      titles: [
+        "Orders and injections by manufacturer",
+        "Orders and injections by healthcare district",
+      ],
     };
   },
   methods: {
     getData() {
-      //time is set to end of the day to get data for the whole day
-      let time = "23:59:59";
+
       let pickedDate = moment(this.picked).format("YYYY-MM-DD").toString();
-      let timeAndDate = pickedDate + " " + time;
+      let timeAndDate = pickedDate + " " + this.appt;
 
       this.ok = false;
       this.loading = true;
