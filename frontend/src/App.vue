@@ -4,34 +4,34 @@
       <div class="controls">
         <form action="#" @submit.prevent="getData">
           <div class="form-group">
-            <button type="submit">Get data for day</button>
+            <p>Date</p>
+            <datepicker
+              v-model="picked"
+              :upperLimit="to"
+              :lowerLimit="from"
+              :monthHeadingFormat="outputFormat"
+              :typeable="true"
+            />
+            <p>
+              Time
+              <input v-model="appt" type="time" id="appt" name="appt" />
+            </p>
+            <button type="submit" class="button">Update dashboard</button>
           </div>
-          <p>Date</p>
-          <datepicker
-            v-model="picked"
-            :upperLimit="to"
-            :lowerLimit="from"
-            :monthHeadingFormat="outputFormat"
-            :typeable="true"
-          />
-          <p>Time</p>
-            <input v-model="appt" type="time" id="appt" name="appt">
         </form>
-
-        <div v-show="loading">Loading...</div>
-        <div v-show="errored">An error occured</div>
-        <div v-show="ok"></div>
+        <div>
+          <div v-show="loading">Loading...</div>
+          <div v-show="errored">An error occured</div>
+          <div v-show="ok">&nbsp;</div>
+        </div>
       </div>
 
       <div class="info">
         <p>
-          Run a manual sweep of anomalous airborne or electromagnetic readings.
-          Radiation levels in our atmosphere have increased by 3,000 percent.
-          Electromagnetic and subspace wave fronts approaching synchronization.
-          What is the strength of the ship's deflector shields at maximum
-          output? The wormhole's size and short period would make this a local
-          phenomenon. Do you have sufficient data to compile a holographic
-          simulation?
+          This dashboard displays data from
+          <a href="https://github.com/solita/vaccine-exercise-2021"
+            >https://github.com/solita/vaccine-exercise-2021</a
+          >.
         </p>
       </div>
     </div>
@@ -69,7 +69,7 @@
       </div>
     </div>
     <div class="data">
-      <DataTable :tableData="data" />
+      <DataTable :tableData="data" :title="titles[2]" />
     </div>
   </div>
 </template>
@@ -106,7 +106,6 @@ export default {
   },
   methods: {
     getData() {
-
       let pickedDate = moment(this.picked).format("YYYY-MM-DD").toString();
       let timeAndDate = pickedDate + " " + this.appt;
 
@@ -222,6 +221,16 @@ body {
   background: #e9e4dc;
 }
 
+a:link,
+a:visited {
+  color: #ee442f;
+}
+
+a:hover,
+a:active {
+  color: #601a4a;
+}
+
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -231,7 +240,7 @@ body {
 }
 
 .panel {
-  padding: 5%;
+  padding: 2%;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
@@ -240,9 +249,25 @@ body {
 
 .controls {
   background: #e9e4dc;
-  padding: 2%;
+  padding: 1%;
   outline-style: dotted;
   outline-color: #e9e4dc;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+}
+
+.button {
+  background-color: #63acbe;
+  border: none;
+  padding: 5%;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
 }
 
 .info {
