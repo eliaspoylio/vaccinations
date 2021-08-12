@@ -73,3 +73,8 @@ def test_show_district_total_day():
 def test_show_timeseries():
     response = client.get("/timeseries")
     assert response.status_code == 200
+
+def test_show_gender_total_day():
+    response = client.get("/gender/total/2021-02-19")
+    assert response.status_code == 200
+    assert response.json() == [{"gender":"female","count":15},{"gender":"male","count":22},{"gender":"nonbinary","count":19}]

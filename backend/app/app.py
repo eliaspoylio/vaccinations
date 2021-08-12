@@ -209,3 +209,15 @@ def show_timeseries(db: Session = Depends(get_db)):
     """)
     result = db.execute(statement).all()
     return result
+
+@app.get("/gender/total/{day}")
+def show_gender_total_day(day, db: Session = Depends(get_db)):
+    statement = text("""
+    SELECT gender, COUNT(id)
+    FROM vaccinations 
+    WHERE DATE(vaccinationDate) = DATE(:day) 
+    GROUP BY gender 
+    ORDER BY gender;
+    """)
+    result = db.execute(statement, {'day': day}).all()
+    return result

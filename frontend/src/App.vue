@@ -72,10 +72,15 @@
         </table>
       </div>
     </div>
-    <div class="data">
+    <div class="charts">
+      <div class="chart">
       <DataTable :tableData="data" :title="titles[2]" />
+      </div>
+      <div class="chart">
+      <Donut :visualData="data[10]" :title="titles[3]" />
+      </div>
     </div>
-    <Line :visualData="mountData[0]" :title="titles[3]" />
+    <Line :visualData="mountData[0]" :title="titles[4]" />
   </div>
 </template>
 
@@ -83,13 +88,14 @@
 import axios from "axios";
 import Chart from "./components/Chart.component.vue";
 import Line from "./components/Line.component.vue";
+import Donut from "./components/Donut.component.vue";
 import DataTable from "./components/DataTable.component.vue";
 import Datepicker from "vue3-datepicker";
 import moment from "moment";
 
 export default {
   name: "app",
-  components: { Chart, Line, DataTable, Datepicker },
+  components: { Chart, Line, Donut, DataTable, Datepicker },
   data() {
     return {
       loading: false,
@@ -109,6 +115,8 @@ export default {
         "Orders and injections by manufacturer",
         "Orders and injections by healthcare district",
         "Situation on given time",
+        "Gender of persons vaccinated on given day",
+        "Time series",
       ],
     };
   },
@@ -163,6 +171,8 @@ export default {
 
       let district = `http://${this.apiUri}/district/total/` + timeAndDate;
 
+      let gender = `http://${this.apiUri}/gender/total/` + timeAndDate;
+
       const reqOrdTotal = axios.get(ordTotal);
 
       const reqVacTotal = axios.get(vacTotal);
@@ -183,6 +193,8 @@ export default {
 
       const reqDistrict = axios.get(district);
 
+      const reqGender = axios.get(gender);
+
       axios
         .all([
           reqOrdTotal,
@@ -195,6 +207,7 @@ export default {
           reqOrdDay,
           reqManufacturer,
           reqDistrict,
+          reqGender,
         ])
         .then(
           axios.spread((...responses) => {
@@ -222,6 +235,8 @@ export default {
 
             const resDistrict = responses[9];
 
+            const resGender = responses[10];
+
             this.data = [
               resOrdTotal.data[0].count,
               resVacTotal.data[0].sum,
@@ -233,6 +248,7 @@ export default {
               resOrdDay.data[0].count,
               resManufacturer.data,
               resDistrict.data,
+              resGender.data,
             ];
           })
         )
@@ -315,6 +331,11 @@ a:active {
   display: flex;
   flex-direction: row;
   max-width: 100%;
+}
+
+.chart {
+  width: 50%;
+  padding: 2%;
 }
 
 .chart-table {
