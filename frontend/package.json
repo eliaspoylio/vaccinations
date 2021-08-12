@@ -11,8 +11,10 @@
     "apexcharts": "^3.27.3",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "moment": "^2.29.1",
     "vue": "^3.0.0",
-    "vue3-apexcharts": "^1.4.1"
+    "vue3-apexcharts": "^1.4.1",
+    "vue3-datepicker": "^0.2.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

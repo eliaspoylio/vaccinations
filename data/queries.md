@@ -162,5 +162,36 @@ GROUP BY orders.id, orders.arrived, orders.injections
 SELECT SUM(vunused)
 FROM injectionsused
 WHERE expires < DATE('20210223') + interval '10' day AND expires > '20210223';
+------------
+SELECT
+date_trunc('day', arrived) AS "day",
+count(orders.id) AS "orders",
+sum(injections) AS "injections",
+count(vaccinations.id) AS "vaccinations"
+FROM orders
+FULL OUTER JOIN vaccinations ON orders.arrived=date_trunc('day', vaccinations.vaccinationDate)
+GROUP BY day
+ORDER BY day;
+--------------
+WITH ordates AS (
+  SELECT
+  date_trunc('day', arrived) AS "day",
+  count(orders.id) AS "orders",
+  sum(injections) AS "injections"
+  FROM orders
+  GROUP BY day
+)
+
+SELECT 
+ordates.day,
+ordates.orders,
+ordates.injections,
+count(vaccinations.id) AS "vaccinations" 
+FROM ordates
+FULL OUTER JOIN vaccinations ON ordates.day=date_trunc('day', vaccinations.vaccinationDate)
+GROUP BY day, ordates.orders, ordates.injections
+ORDER BY day;
+
+SELECT sum(ordates.orders) FROM ordates;
 ```
 

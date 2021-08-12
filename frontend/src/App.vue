@@ -1,83 +1,75 @@
 <template>
   <div id="app">
-    <form action="#" @submit.prevent="getData">
-      <div class="form-group">
-        <input type="text" placeholder="date" v-model="date" />
+    <div class="panel">
+      <div class="controls">
+        <form action="#" @submit.prevent="getData">
+          <div class="form-group">
+            <p>Date</p>
+            <datepicker
+              v-model="picked"
+              :upperLimit="to"
+              :lowerLimit="from"
+              :monthHeadingFormat="outputFormat"
+              :typeable="true"
+            />
+            <p>
+              Time
+              <input v-model="appt" type="time" id="appt" name="appt" />
+            </p>
+            <button type="submit" class="button">Update dashboard</button>
+          </div>
+        </form>
+        <div>
+          <div v-show="loading">Loading...</div>
+          <div v-show="errored">An error occured</div>
+          <div v-show="ok">&nbsp;</div>
+        </div>
       </div>
-    </form>
-    <div v-show="loading">Loading...</div>
-    <div v-show="errored">An error occured</div>
 
-    <div class="data">
-      <table>
-        <tr>
-          <td>How many orders have arrived total</td>
-          <td>{{ data[0] }}</td>
-        </tr>
-        <tr>
-          <td>How many vaccines have arrived total</td>
-          <td>{{ data[1] }}</td>
-        </tr>
-        <tr>
-          <td>How many of the vaccinations have been used</td>
-          <td>{{ data[2] }}</td>
-        </tr>
-        <tr>
-          <td>How many bottles have expired</td>
-          <td>{{ data[3] }}</td>
-        </tr>
-        <tr>
-          <td>How many vaccines expired before the usage</td>
-          <td>{{ data[4] }}</td>
-        </tr>
-        <tr>
-          <td>How many vaccines are left to use</td>
-          <td>{{ data[5] }}</td>
-        </tr>
-        <tr>
-          <td>How many vaccines are going to expire in the next 10 days</td>
-          <td>{{ data[6] }}</td>
-        </tr>
-        <tr>
-          <td>How many ordes arrived on this day</td>
-          <td>{{ data[7] }}</td>
-        </tr>
-      </table>
-      <div class="charts">
-        <div class="chart-table">
-          <Chart :districtData="data[8]" />
-          <table>
-            <tr>
-              <th>Producer</th>
-              <th>Orders</th>
-              <th>Vaccines</th>
-            </tr>
-            <tr
-              v-for="(manufacturer) in data[8]"
-              :key="manufacturer.vaccine"
-            >
-              <td>{{ manufacturer.vaccine }}</td>
-              <td>{{ manufacturer.orders }}</td>
-              <td>{{ manufacturer.injections }}</td>
-            </tr>
-          </table>
-        </div>
-        <div class="chart-table">
-            <Chart :districtData="data[9]" />
-          <table>
-            <tr>
-              <th>Healthcare district</th>
-              <th>Orders</th>
-              <th>Vaccines</th>
-            </tr>
-            <tr v-for="district in data[9]" :key="district.healthcaredistrict">
-              <td>{{ district.healthcaredistrict }}</td>
-              <td>{{ district.orders }}</td>
-              <td>{{ district.injections }}</td>
-            </tr>
-          </table>
-        </div>
+      <div class="info">
+        <p>
+          This dashboard displays data from
+          <a href="https://github.com/solita/vaccine-exercise-2021"
+            >https://github.com/solita/vaccine-exercise-2021</a
+          >.
+        </p>
       </div>
+    </div>
+
+    <div class="charts">
+      <div class="chart-table">
+        <Chart :visualData="data[8]" :title="titles[0]" />
+        <table>
+          <tr>
+            <th>Producer</th>
+            <th>Orders</th>
+            <th>Injections</th>
+          </tr>
+          <tr v-for="manufacturer in data[8]" :key="manufacturer.vaccine">
+            <td>{{ manufacturer.vaccine }}</td>
+            <td>{{ manufacturer.orders }}</td>
+            <td>{{ manufacturer.injections }}</td>
+          </tr>
+        </table>
+      </div>
+      <div class="chart-table">
+        <Chart :visualData="data[9]" :title="titles[1]" />
+        <table>
+          <tr>
+            <th>Healthcare district</th>
+            <th>Orders</th>
+            <th>Injections</th>
+          </tr>
+          <tr v-for="district in data[9]" :key="district.healthcaredistrict">
+            <td>{{ district.healthcaredistrict }}</td>
+            <td>{{ district.orders }}</td>
+            <td>{{ district.injections }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="data">
+      <DataTable :tableData="data" :title="titles[2]" />
     </div>
   </div>
 </template>
@@ -85,45 +77,62 @@
 <script>
 import axios from "axios";
 import Chart from "./components/Chart.component.vue";
+import DataTable from "./components/DataTable.component.vue";
+import Datepicker from "vue3-datepicker";
+import moment from "moment";
 
 export default {
   name: "app",
-  components: { Chart },
+  components: { Chart, DataTable, Datepicker },
   data() {
     return {
       loading: false,
       errored: false,
+      ok: true,
       date: "20210412",
       data: [],
-      districtData: [],
+      visualData: [],
       apiUri: process.env.VUE_APP_API_URI,
+      picked: new Date(2021, 3, 12),
+      to: new Date(2021, 3, 12),
+      from: new Date(2021, 0, 2),
+      outputFormat: "yyyy-MM-dd",
+      appt: "23:59",
+      titles: [
+        "Orders and injections by manufacturer",
+        "Orders and injections by healthcare district",
+      ],
     };
   },
   methods: {
     getData() {
+      let pickedDate = moment(this.picked).format("YYYY-MM-DD").toString();
+      let timeAndDate = pickedDate + " " + this.appt;
+
+      this.ok = false;
       this.loading = true;
 
-      let ordTotal = `http://${this.apiUri}/orders/total/` + this.date;
+      let ordTotal = `http://${this.apiUri}/orders/total/` + timeAndDate;
 
-      let vacTotal = `http://${this.apiUri}/vaccinations/total/` + this.date;
+      let vacTotal = `http://${this.apiUri}/vaccinations/total/` + timeAndDate;
 
-      let vacUsed = `http://${this.apiUri}/vaccinations/used/` + this.date;
+      let vacUsed = `http://${this.apiUri}/vaccinations/used/` + timeAndDate;
 
-      let ordExp = `http://${this.apiUri}/orders/expired/` + this.date;
+      let ordExp = `http://${this.apiUri}/orders/expired/` + timeAndDate;
 
-      let vacExp = `http://${this.apiUri}/vaccinations/expired/` + this.date;
+      let vacExp = `http://${this.apiUri}/vaccinations/expired/` + timeAndDate;
 
-      let vacLeft = `http://${this.apiUri}/vaccinations/left/` + this.date;
+      let vacLeft = `http://${this.apiUri}/vaccinations/left/` + timeAndDate;
 
       let vacExpTen =
-        `http://${this.apiUri}/vaccinations/expiring_tendays/` + this.date;
+        `http://${this.apiUri}/vaccinations/expiring_tendays/` + timeAndDate;
 
-      let ordDay = `http://${this.apiUri}/orders/day/` + this.date;
+      let ordDay = `http://${this.apiUri}/orders/day/` + timeAndDate;
 
       let manufacturer =
-        `http://${this.apiUri}/manufacturer/total/` + this.date;
+        `http://${this.apiUri}/manufacturer/total/` + timeAndDate;
 
-      let district = `http://${this.apiUri}/district/total/` + this.date;
+      let district = `http://${this.apiUri}/district/total/` + timeAndDate;
 
       const reqOrdTotal = axios.get(ordTotal);
 
@@ -162,6 +171,7 @@ export default {
           axios.spread((...responses) => {
             this.loading = false;
             this.errored = false;
+            this.ok = true;
 
             const resOrdTotal = responses[0];
 
@@ -182,7 +192,6 @@ export default {
             const resManufacturer = responses[8];
 
             const resDistrict = responses[9];
-
 
             this.data = [
               resOrdTotal.data[0].count,
@@ -208,29 +217,82 @@ export default {
 </script>
 
 <style>
+body {
+  background: #e9e4dc;
+}
+
+a:link,
+a:visited {
+  color: #ee442f;
+}
+
+a:hover,
+a:active {
+  color: #601a4a;
+}
+
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  background: #f9f4ec;
+}
+
+.panel {
+  padding: 2%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  max-width: 100%;
+}
+
+.controls {
+  background: #e9e4dc;
+  padding: 1%;
+  outline-style: dotted;
+  outline-color: #e9e4dc;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+}
+
+.button {
+  background-color: #63acbe;
+  border: none;
+  padding: 5%;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.info {
+  background: #e9e4dc;
+  padding: 2%;
+  max-width: 50%;
+  outline-style: dotted;
+  outline-color: #e9e4dc;
+}
+
+.data {
+  padding: 2%;
 }
 
 .charts {
   display: flex;
   flex-direction: row;
-  width: 100%;
+  max-width: 100%;
 }
 
 .chart-table {
   display: flex;
   flex-direction: column;
   width: 50%;
-}
-
-.chartsrow {
-  flex-direction: row;
+  padding: 2%;
 }
 
 table {
@@ -241,12 +303,12 @@ table {
 
 td,
 th {
-  border: 1px solid #dddddd;
+  border: 1px solid #e9e4dc;
   text-align: left;
   padding: 8px;
 }
 
 tr:nth-child(even) {
-  background-color: #dddddd;
+  background-color: #e9e4dc;
 }
 </style>
