@@ -174,3 +174,7 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# cypress
+.eslint*
+*.mp4

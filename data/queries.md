@@ -193,5 +193,12 @@ GROUP BY day, ordates.orders, ordates.injections
 ORDER BY day;
 
 SELECT sum(ordates.orders) FROM ordates;
+
+------------
+SELECT gender, COUNT(id)
+FROM vaccinations 
+WHERE DATE(vaccinationDate) = DATE('2021-02-19') 
+GROUP BY gender 
+ORDER BY gender;
 ```
 

@@ -27,11 +27,16 @@
       </div>
 
       <div class="info">
+        <h2>Vaccination dashboard</h2>
         <p>
           This dashboard displays data from
           <a href="https://github.com/solita/vaccine-exercise-2021"
             >https://github.com/solita/vaccine-exercise-2021</a
-          >.
+          >. The data contains information about vaccines and vaccinations.
+        </p>
+        <p>
+          Choose a date and time and update the dashboard to view aggregate
+          data.
         </p>
       </div>
     </div>
@@ -68,8 +73,16 @@
         </table>
       </div>
     </div>
-    <div class="data">
+    <div class="charts">
+      <div class="chart">
       <DataTable :tableData="data" :title="titles[2]" />
+      </div>
+      <div class="chart">
+      <Donut :visualData="data[10]" :title="titles[3]" />
+      </div>
+    </div>
+    <div class="data">
+    <Line :visualData="mountData[0]" :title="titles[4]" />
     </div>
   </div>
 </template>
@@ -77,13 +90,15 @@
 <script>
 import axios from "axios";
 import Chart from "./components/Chart.component.vue";
+import Line from "./components/Line.component.vue";
+import Donut from "./components/Donut.component.vue";
 import DataTable from "./components/DataTable.component.vue";
 import Datepicker from "vue3-datepicker";
 import moment from "moment";
 
 export default {
   name: "app",
-  components: { Chart, DataTable, Datepicker },
+  components: { Chart, Line, Donut, DataTable, Datepicker },
   data() {
     return {
       loading: false,
@@ -91,21 +106,52 @@ export default {
       ok: true,
       date: "20210412",
       data: [],
+      mountData: [],
       visualData: [],
       apiUri: process.env.VUE_APP_API_URI,
       picked: new Date(2021, 3, 12),
-      to: new Date(2021, 3, 12),
-      from: new Date(2021, 0, 2),
+      from: new Date(),
+      to: new Date(),
       outputFormat: "yyyy-MM-dd",
       appt: "23:59",
       titles: [
         "Orders and injections by manufacturer",
         "Orders and injections by healthcare district",
+        "Situation on given time",
+        "Gender of persons vaccinated on given day",
+        "Time series of orders, injections and vaccinations",
       ],
     };
   },
+  mounted() {
+    let timeSeries = `http://${this.apiUri}/timeseries`;
+    const reqTimeSeries = axios.get(timeSeries);
+    axios
+      .all([reqTimeSeries])
+      .then(
+        axios.spread((...responses) => {
+          this.loading = false;
+          this.errored = false;
+          this.ok = true;
+
+          const resTimeSeries = responses[0];
+
+          this.mountData = [resTimeSeries.data];
+
+          // set limits to date picker from time series data
+          this.from = new Date(this.mountData[0][0].day);
+          this.to = new Date(this.mountData[0][this.mountData[0].length - 1].day);
+          this.picked = new Date(this.mountData[0][this.mountData[0].length - 1].day);
+        })
+      )
+      .catch(() => {
+        this.loading = false;
+        this.errored = true;
+      });
+  },
   methods: {
     getData() {
+      // set date to correct format and concat date and time
       let pickedDate = moment(this.picked).format("YYYY-MM-DD").toString();
       let timeAndDate = pickedDate + " " + this.appt;
 
@@ -134,6 +180,8 @@ export default {
 
       let district = `http://${this.apiUri}/district/total/` + timeAndDate;
 
+      let gender = `http://${this.apiUri}/gender/total/` + timeAndDate;
+
       const reqOrdTotal = axios.get(ordTotal);
 
       const reqVacTotal = axios.get(vacTotal);
@@ -154,6 +202,8 @@ export default {
 
       const reqDistrict = axios.get(district);
 
+      const reqGender = axios.get(gender);
+
       axios
         .all([
           reqOrdTotal,
@@ -166,6 +216,7 @@ export default {
           reqOrdDay,
           reqManufacturer,
           reqDistrict,
+          reqGender,
         ])
         .then(
           axios.spread((...responses) => {
@@ -193,6 +244,8 @@ export default {
 
             const resDistrict = responses[9];
 
+            const resGender = responses[10];
+
             this.data = [
               resOrdTotal.data[0].count,
               resVacTotal.data[0].sum,
@@ -204,6 +257,7 @@ export default {
               resOrdDay.data[0].count,
               resManufacturer.data,
               resDistrict.data,
+              resGender.data,
             ];
           })
         )
@@ -286,6 +340,11 @@ a:active {
   display: flex;
   flex-direction: row;
   max-width: 100%;
+}
+
+.chart {
+  width: 50%;
+  padding: 2%;
 }
 
 .chart-table {

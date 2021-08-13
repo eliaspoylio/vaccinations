@@ -60,16 +60,6 @@ def test_show_orders_arrived_day():
     assert response.status_code == 200
     assert response.json() == [{"count": 61}]
 
-def test_show_orders_manufacturer_total_day():
-    response = client.get("/orders/manufacturer/total/2021-04-12T11:10:06.473587Z")
-    assert response.status_code == 200
-    assert response.json() == [{"vaccine":"Antiqua","count":1661},{"vaccine":"SolarBuddhica","count":1676},{"vaccine":"Zerpfy","count":1663}]
-
-def test_show_vaccinations_manufacturer_total_day():
-    response = client.get("/vaccinations/manufacturer/total/2021-04-12")
-    assert response.status_code == 200
-    assert response.json() == [{"vaccine":"Antiqua","sum":6596},{"vaccine":"SolarBuddhica","sum":10014},{"vaccine":"Zerpfy","sum":8285}]
-
 def test_show_manufacturer_total_day():
     response = client.get("/manufacturer/total/2021-04-12T11:10:06.473587Z")
     assert response.status_code == 200
@@ -79,3 +69,12 @@ def test_show_district_total_day():
     response = client.get("/district/total/2021-01-06")
     assert response.status_code == 200
     assert response.json() == [{"healthcaredistrict":"HYKS","orders":66,"injections":333},{"healthcaredistrict":"KYS","orders":21,"injections":103},{"healthcaredistrict":"OYS","orders":21,"injections":106},{"healthcaredistrict":"TAYS","orders":33,"injections":163},{"healthcaredistrict":"TYKS","orders":25,"injections":124}]
+
+def test_show_timeseries():
+    response = client.get("/timeseries")
+    assert response.status_code == 200
+
+def test_show_gender_total_day():
+    response = client.get("/gender/total/2021-02-19")
+    assert response.status_code == 200
+    assert response.json() == [{"gender":"female","count":15},{"gender":"male","count":22},{"gender":"nonbinary","count":19}]

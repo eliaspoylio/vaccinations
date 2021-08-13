@@ -14,7 +14,8 @@ app = FastAPI()
 
 origins = [
     'http://localhost',
-    'http://localhost:3000',
+    'http://localhost:3000', # app in frontend container
+    'http://localhost:8081', # cypress server
     'localhost'
 ]
 
@@ -170,22 +171,6 @@ def show_orders_arrived_day(day, db: Session = Depends(get_db)):
     result = db.execute(statement).all()
     return result
 
-@app.get("/orders/manufacturer/total/{day}")
-def show_orders_manufacturer_total_day(day, db: Session = Depends(get_db)):
-    statement = text("""
-    SELECT vaccine, COUNT(id) FROM orders WHERE arrived < :day GROUP BY vaccine ORDER BY vaccine;
-    """)
-    result = db.execute(statement, {'day': day}).all()
-    return result
-
-@app.get("/vaccinations/manufacturer/total/{day}")
-def show_vaccinations_manufacturer_total_day(day, db: Session = Depends(get_db)):
-    statement = text("""
-    SELECT vaccine, SUM(injections) FROM orders WHERE arrived < :day GROUP BY vaccine ORDER BY vaccine;
-    """)
-    result = db.execute(statement, {'day': day}).all()
-    return result
-
 @app.get("/manufacturer/total/{day}")
 def show_manufacturer_total_day(day, db: Session = Depends(get_db)):
     statement = text("""
@@ -198,6 +183,42 @@ def show_manufacturer_total_day(day, db: Session = Depends(get_db)):
 def show_district_total_day(day, db: Session = Depends(get_db)):
     statement = text("""
     SELECT healthcaredistrict, COUNT(id) AS orders, SUM(injections) AS injections FROM orders WHERE arrived <= :day GROUP BY healthcaredistrict ORDER BY healthcaredistrict;
+    """)
+    result = db.execute(statement, {'day': day}).all()
+    return result
+
+@app.get("/timeseries")
+def show_timeseries(db: Session = Depends(get_db)):
+    statement = text("""
+    WITH ordates AS (
+      SELECT
+      date_trunc('day', arrived) AS "day",
+      count(orders.id) AS "orders",
+      sum(injections) AS "injections"
+      FROM orders
+      GROUP BY day
+      )
+    SELECT 
+    date(ordates.day) AS day,
+    ordates.orders,
+    ordates.injections,
+    count(vaccinations.id) AS "vaccinations" 
+    FROM ordates
+    FULL OUTER JOIN vaccinations ON ordates.day=date_trunc('day', vaccinations.vaccinationDate)
+    GROUP BY day, ordates.orders, ordates.injections
+    ORDER BY day;
+    """)
+    result = db.execute(statement).all()
+    return result
+
+@app.get("/gender/total/{day}")
+def show_gender_total_day(day, db: Session = Depends(get_db)):
+    statement = text("""
+    SELECT gender, COUNT(id)
+    FROM vaccinations 
+    WHERE DATE(vaccinationDate) = DATE(:day) 
+    GROUP BY gender 
+    ORDER BY gender;
     """)
     result = db.execute(statement, {'day': day}).all()
     return result
