@@ -27,6 +27,7 @@
       </div>
 
       <div class="info">
+        <h2>Vaccination dashboard</h2>
         <p>
           This dashboard displays data from
           <a href="https://github.com/solita/vaccine-exercise-2021"

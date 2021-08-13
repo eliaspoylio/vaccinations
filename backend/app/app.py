@@ -14,7 +14,8 @@ app = FastAPI()
 
 origins = [
     'http://localhost',
-    'http://localhost:3000',
+    'http://localhost:3000', # app in frontend container
+    'http://localhost:8081', # cypress server
     'localhost'
 ]
 
