@@ -1,6 +1,10 @@
 # Vaccination exercise
 
+Assignment based on:
 https://github.com/solita/vaccine-exercise-2021
+
+Live version:
+https://eliaspoyliovaccinations.herokuapp.com/
 
 ## Requirements to run locally
 
