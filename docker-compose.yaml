@@ -18,6 +18,7 @@ services:
           - ./data/resources/sql/populate_tables.sql:/docker-entrypoint-initdb.d/populate_tables.sql
     backend:
         build: ./backend
+        restart: always
         environment: 
           - POSTGRES_USER=${POSTGRES_USER:-postgres}
           - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
