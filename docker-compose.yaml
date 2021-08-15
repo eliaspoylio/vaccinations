@@ -30,6 +30,7 @@ services:
         - ./backend:/app
         depends_on:
           - "postgres"
+        # postgres usually starts a bit slower than backend so compose waits until db is up
         command: bash -c 'while !</dev/tcp/postgres/5432; do sleep 1; done; python main.py'
     frontend:
         build: ./frontend

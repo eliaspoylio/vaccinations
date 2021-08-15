@@ -113,7 +113,7 @@ export default {
       from: new Date(),
       to: new Date(),
       outputFormat: "yyyy-MM-dd",
-      appt: "23:59",
+      appt: "23:59", // set to end of the by default so data from chosen day is taken to account
       titles: [
         "Orders and injections by manufacturer",
         "Orders and injections by healthcare district",
