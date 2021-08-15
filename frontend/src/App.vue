@@ -108,7 +108,7 @@ export default {
       data: [],
       mountData: [],
       visualData: [],
-      apiUri: process.env.VUE_APP_API_URI,
+      apiUri: process.env.VUE_APP_API_URI || 'http://localhost:8080',
       picked: new Date(2021, 3, 12),
       from: new Date(),
       to: new Date(),

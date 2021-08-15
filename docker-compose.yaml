@@ -4,9 +4,9 @@ services:
         image: postgres:latest
         restart: always
         environment: 
-          - POSTGRES_USER=${POSTGRES_USER}
-          - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-          - POSTGRES_DB=${POSTGRES_DB}
+          - POSTGRES_USER=${POSTGRES_USER:-postgres}
+          - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+          - POSTGRES_DB=${POSTGRES_DB:-vaccinations}
         logging:
           options:
             max-size: 10m
@@ -18,11 +18,12 @@ services:
           - ./data/resources/sql/populate_tables.sql:/docker-entrypoint-initdb.d/populate_tables.sql
     backend:
         build: ./backend
+        restart: always
         environment: 
-          - POSTGRES_USER=${POSTGRES_USER}
-          - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-          - POSTGRES_URL=${POSTGRES_URL}
-          - POSTGRES_DB=${POSTGRES_DB}
+          - POSTGRES_USER=${POSTGRES_USER:-postgres}
+          - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+          - POSTGRES_URL=${POSTGRES_URL:-postgres:5432}
+          - POSTGRES_DB=${POSTGRES_DB:-vaccinations}
         ports:
           - 8080:8080
         volumes:
