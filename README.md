@@ -15,7 +15,7 @@ https://eliaspoyliovaccinations.herokuapp.com/
 
 1. In `/frontend` run: `npm install -g @vue/cli`
 
-2. In project root run docker compose: `docker-compose --env-file .env up --build`
+2. In project root run docker compose: `docker-compose up --build`
 
 ## Testing
 
