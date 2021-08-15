@@ -13,9 +13,11 @@ https://eliaspoyliovaccinations.herokuapp.com/
 
 ## Get started
 
-1. In `/frontend` run: `npm install -g @vue/cli`
+1. In `/frontend` run: `npm install`
 
-2. In project root run docker compose: `docker-compose up --build`
+2. In `/frontend` run: `npm install -g @vue/cli`
+
+3. In project root run docker compose: `docker-compose up --build`
 
 ## Testing
 
@@ -28,8 +30,6 @@ To run pytest in backend container, run in in the project root:
 ### Frontend
 
 To run Cypress test suite locally, run in `/frontend` folder:
-
-`npm install`
 
 `npm run test:e2e`
 
