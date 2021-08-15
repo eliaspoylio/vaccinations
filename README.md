@@ -23,7 +23,7 @@ POSTGRES_DB=vaccinations
 
 Create `frontend/.env` file:
 ```
-VUE_APP_API_URI=localhost:8080
+VUE_APP_API_URI=http://localhost:8080
 ```
 
 In project root run docker compose:
@@ -37,7 +37,7 @@ Swagger docs created by FastAPI: http://127.0.0.1:8080/docs
 
 ### Backend
 
-To run Starlette Test Client in backend container:
+To run Starlette Test Client in backend container, run in in the project root:
 
 `chmod 777 test.sh`
 
@@ -45,12 +45,15 @@ To run Starlette Test Client in backend container:
 
 ### Frontend
 
-To run Cypress test suite locally:
+To run Cypress test suite locally, run in `/frontend` folder:
 
 `npm install`
 
 `npm run test:e2e`
 
-`chmod 777 psql.sh`
+
+## Shutting down
+
+Shut docker down with:
 `docker-compose down`
 

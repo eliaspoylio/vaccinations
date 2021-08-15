@@ -75,14 +75,14 @@
     </div>
     <div class="charts">
       <div class="chart">
-      <DataTable :tableData="data" :title="titles[2]" />
+        <DataTable :tableData="data" :title="titles[2]" />
       </div>
       <div class="chart">
-      <Donut :visualData="data[10]" :title="titles[3]" />
+        <Donut :visualData="data[10]" :title="titles[3]" />
       </div>
     </div>
     <div class="data">
-    <Line :visualData="mountData[0]" :title="titles[4]" />
+      <Line :visualData="mountData[0]" :title="titles[4]" />
     </div>
   </div>
 </template>
@@ -124,7 +124,7 @@ export default {
     };
   },
   mounted() {
-    let timeSeries = `http://${this.apiUri}/timeseries`;
+    let timeSeries = `${this.apiUri}/timeseries`;
     const reqTimeSeries = axios.get(timeSeries);
     axios
       .all([reqTimeSeries])
@@ -140,8 +140,12 @@ export default {
 
           // set limits to date picker from time series data
           this.from = new Date(this.mountData[0][0].day);
-          this.to = new Date(this.mountData[0][this.mountData[0].length - 1].day);
-          this.picked = new Date(this.mountData[0][this.mountData[0].length - 1].day);
+          this.to = new Date(
+            this.mountData[0][this.mountData[0].length - 1].day
+          );
+          this.picked = new Date(
+            this.mountData[0][this.mountData[0].length - 1].day
+          );
         })
       )
       .catch(() => {
@@ -158,29 +162,28 @@ export default {
       this.ok = false;
       this.loading = true;
 
-      let ordTotal = `http://${this.apiUri}/orders/total/` + timeAndDate;
+      let ordTotal = `${this.apiUri}/orders/total/` + timeAndDate;
 
-      let vacTotal = `http://${this.apiUri}/vaccinations/total/` + timeAndDate;
+      let vacTotal = `${this.apiUri}/vaccinations/total/` + timeAndDate;
 
-      let vacUsed = `http://${this.apiUri}/vaccinations/used/` + timeAndDate;
+      let vacUsed = `${this.apiUri}/vaccinations/used/` + timeAndDate;
 
-      let ordExp = `http://${this.apiUri}/orders/expired/` + timeAndDate;
+      let ordExp = `${this.apiUri}/orders/expired/` + timeAndDate;
 
-      let vacExp = `http://${this.apiUri}/vaccinations/expired/` + timeAndDate;
+      let vacExp = `${this.apiUri}/vaccinations/expired/` + timeAndDate;
 
-      let vacLeft = `http://${this.apiUri}/vaccinations/left/` + timeAndDate;
+      let vacLeft = `${this.apiUri}/vaccinations/left/` + timeAndDate;
 
       let vacExpTen =
-        `http://${this.apiUri}/vaccinations/expiring_tendays/` + timeAndDate;
+        `${this.apiUri}/vaccinations/expiring_tendays/` + timeAndDate;
 
-      let ordDay = `http://${this.apiUri}/orders/day/` + timeAndDate;
+      let ordDay = `${this.apiUri}/orders/day/` + timeAndDate;
 
-      let manufacturer =
-        `http://${this.apiUri}/manufacturer/total/` + timeAndDate;
+      let manufacturer = `${this.apiUri}/manufacturer/total/` + timeAndDate;
 
-      let district = `http://${this.apiUri}/district/total/` + timeAndDate;
+      let district = `${this.apiUri}/district/total/` + timeAndDate;
 
-      let gender = `http://${this.apiUri}/gender/total/` + timeAndDate;
+      let gender = `${this.apiUri}/gender/total/` + timeAndDate;
 
       const reqOrdTotal = axios.get(ordTotal);
 
@@ -369,5 +372,34 @@ th {
 
 tr:nth-child(even) {
   background-color: #e9e4dc;
+}
+
+@media only screen and (max-width: 600px) {
+  .panel {
+    flex-direction: column-reverse;
+    padding: 2%;
+  }
+
+  .controls {
+    padding: 1%;
+    outline-style: none;
+  }
+
+  .info {
+    max-width: 100%;
+    outline-style: none;
+  }
+
+  .charts {
+    flex-direction: column;
+  }
+
+  .chart-table {
+    width: 100%;
+  }
+
+  .chart {
+    width: 100%;
+  }
 }
 </style>
