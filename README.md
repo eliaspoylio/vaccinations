@@ -9,6 +9,7 @@ https://eliaspoyliovaccinations.herokuapp.com/
 ## Requirements to run locally
 
 - Docker
+- docker-compose
 - NodeJS
 
 ## Get started
