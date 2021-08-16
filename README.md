@@ -19,6 +19,8 @@ https://eliaspoyliovaccinations.herokuapp.com/
 
 3. In project root run docker compose: `docker-compose up --build`
 
+Data dashboard should be running at: http://localhost:3000/ 
+
 ## Testing
 
 ### Backend
